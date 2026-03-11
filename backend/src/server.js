@@ -1,8 +1,29 @@
-import express from"express";
-const app =express();
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
-app.get("/api/health",(req,res)=>{
-    res.status(200).json({Message:"success"});
+const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+app.use(express.json());
+
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ message: "success" });
 });
 
-app.listen(3000, () =>console.log("server is up and running"));
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../admin/dist")));
+
+  app.get("/*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../admin/dist/index.html"));
+  });
+}
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("server is up and running");
+});
