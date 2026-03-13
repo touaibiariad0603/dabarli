@@ -3,7 +3,7 @@ import React from 'react'
 function App() {
   return (
     <div>
-      app
+    this is my first admin dash 
     </div>
   )
 }
