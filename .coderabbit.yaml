@@ -1,4 +1,5 @@
 reviews:
-  review_status: true   # true = montre le message de statut
-  branches:
-    - "*"              # "*" = toutes les branches
+  path_filters:
+    - "**/*.js"
+    - "**/*.ts"
+    - "**/dist/**"
