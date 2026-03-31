@@ -4,7 +4,7 @@ import { clerkMiddleware } from "@clerk/express";
 import { serve} from "inngest/express";
 
 import { functions,inngest } from "./config/inngest.js";
-
+import adminRoutes from "./routes/admin.route.js";4
 
 const app = express();
 
@@ -17,6 +17,8 @@ app.use(express.json());//adds auth object  under  the req =>request.aut
 
 
 app.use("/api/inngest",serve({client:inngest, functions}));
+
+app.use("/api/admin",adminRoutes);
 
 // Root route
 app.get("/", (req, res) => {
