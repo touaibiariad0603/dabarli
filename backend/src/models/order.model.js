@@ -1,4 +1,3 @@
-import { Type } from "lucide-react";
 import mongoose, { mongo } from "mongoose";
 import { Product } from "./product.model.js";
 import { types } from "inngest/internals";
