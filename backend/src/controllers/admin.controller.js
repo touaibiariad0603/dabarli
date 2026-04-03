@@ -160,7 +160,7 @@ try{
 export async function  getAllCustomers(_,res){
 
     try{
-        const customers = await User.find().sort({createdAt:-1});//latest user first
+        const customers = await user.find().sort({createdAt:-1});//latest user first
         res.status(200).json({customers});
     }catch (error){
         console.error("error fetching customers:",error);
@@ -187,6 +187,8 @@ export async function getDashboardStats(_,res) {
     const totalRevenue = revenueResult[0]?.total || 0;
     
     const totalCustomers = await user.countDocuments();
+    console.log("Total customers:", totalCustomers);
+
     const totalProducts = await Product.countDocuments();
 
     res.status(200).json({
