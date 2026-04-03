@@ -8,11 +8,13 @@ import CustomersPage from "./pages/CustomerPage"
 import DashboardLayout from "./Layouts/DashboardLayout";
 
 import PageLoader from "./components/PageLoader";
+import { useAxios } from "./lib/useAxios";
+
 
 
 function App() {
   const {isSignedIn, isLoaded} = useAuth();
-
+   useAxios(); 
   if (!isLoaded) return <PageLoader/>;
 
   return (

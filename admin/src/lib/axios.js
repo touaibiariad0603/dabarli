@@ -1,8 +1,9 @@
 import axios from "axios";
+import { useAuth } from "@clerk/clerk-react";
 
 const axiosInstance = axios.create({
-    baseURL:import.meta.env.VITE_API_URL,
-    withCredentials:true,//by adding this field browser will send the cookies to server automatically, on every single req
-})
+    baseURL: import.meta.env.VITE_API_URL,
+    withCredentials: true,
+});
 
 export default axiosInstance
