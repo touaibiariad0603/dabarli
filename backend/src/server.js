@@ -22,7 +22,26 @@ app.use(clerkMiddleware());
 
 // Middleware
 app.use(express.json());//adds auth object  under  the req =>request.aut
-app.use(cors({origin:ENV.CLIENT_URL, credentials:true}));//credentials : true allows the browser to send  the wookies to the server with the request
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      ENV.CLIENT_URL, // your main production URL
+    ];
+
+    if (!origin) return callback(null, true);
+    
+    if (origin.includes('dabarli') && origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+}));;//credentials : true allows the browser to send  the wookies to the server with the request
 
 app.use("/api/inngest",serve({client:inngest, functions}));
 
