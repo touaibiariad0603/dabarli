@@ -1,7 +1,7 @@
 import { useUser } from "@clerk/clerk-react";
 import { ShoppingBagIcon } from "lucide-react";
 import{Link,useLocation} from "react-router"
-import { NAVIGATION } from "./navbar";
+import { NAVIGATION } from "./Navbar";
 
 
 function    Sidebar(){
@@ -53,7 +53,7 @@ function    Sidebar(){
                             {user?.firstName} {user?.lastName}
                         </p>
 
-                        <p className="text-xs opacity-50 truncate">{user?.emailAddresses[0]?.emailAddress}</p>
+                        <p className="text-xs opacity-50 truncate">{user?.emailAddresses?.[0]?.emailAddress}</p>
                     </div>
                 </div>
             </div>
