@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { productApi } from "../lib/api";
 import { getStockStatusBadge } from "../lib/utils";
 
+
 function ProductsPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -63,18 +64,18 @@ const deleteProductMutation = useMutation({
     setImagePreviews([]);
   };
 
-  const handleEdit = (product) => {
-    setEditingProduct(product);
-    setFormData({
-      name: product.name,
-      category: product.category,
-      price: product.price.toString(),
-      stock: product.stock.toString(),
-      description: product.description,
-    });
-    setImagePreviews(product.images);
-    setShowModal(true);
-  };
+const handleEdit = (product) => {
+  setEditingProduct(product);
+  setFormData({
+    name: product.name ?? "",
+    category: product.category ?? "",
+    price: (product.price ?? 0).toString(),
+    stock: (product.stock ?? 0).toString(),
+    description: product.description ?? "",
+  });
+  setImagePreviews(product.images ?? []);
+  setShowModal(true);
+};
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -139,7 +140,7 @@ const deleteProductMutation = useMutation({
                 <div className="flex items-center gap-6">
                   <div className="avatar">
                     <div className="w-20 rounded-xl">
-                      <img src={product.images[0]} alt={product.name} />
+                      <img src={product.images?.[0]} alt={product.name} />
                     </div>
                   </div>
 
