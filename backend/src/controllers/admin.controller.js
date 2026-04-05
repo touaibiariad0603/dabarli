@@ -1,4 +1,4 @@
-import cloudinary from "..//config/cloudinary.js"
+import cloudinary from "../config/cloudinary.js"
 import {Product} from "../models/product.model.js"
 import{Order} from "../models/order.model.js"
 import{user} from "../models/user.model.js"
@@ -85,7 +85,7 @@ export  async function updateProduct(req,res) {
         //handle image updates if new images uploaded
 
         if (req.files && req.files.length>0){
-            if(req.files>3){
+            if(req.files.length>3){
                 return res.status(400).json({message:"Maximum 3 images allowed"});
             }
 
@@ -133,18 +133,18 @@ try{
         return res.status(400).json({error:"Invalid status"});
     }
 
-    const order = await order.findById(orderId);
+    const order = await Order.findById(orderId);
     if(!order){
         return res.status(404).json({error:"order not found"});
     }
 
     order.status=status
 
-    if(status==="shipped"&&"!shippedAt"){
+    if(status === "shipped" && !order.shippedAt){
         order.shippedAt = new Date();
     }
 
-      if(status==="delivered"&&"!deliveredAt"){
+      if(status === "delivered" && !order.deliveredAt){
         order.deliveredAt = new Date();
     }
 
@@ -152,7 +152,8 @@ try{
 
     res.status(200).json({message:"Order status updated succesfully",order});
 } catch (error){
-    console.error("error in updateOrderStatus controller",error);
+    console.error("error in updateOrderStatus controller", error);
+    res.status(500).json({ error: "Internal server error" });
 }
     
 }
@@ -168,6 +169,29 @@ export async function  getAllCustomers(_,res){
 
     }
 
+}
+
+
+export async function deleteProduct(req, res) {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findById(id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    // delete images from cloudinary
+    for (const imageUrl of product.images) {
+      const publicId = imageUrl.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(`products/${publicId}`);
+    }
+
+    await Product.findByIdAndDelete(id);
+    res.status(200).json({ message: "Product deleted successfully" });
+
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 }
 
 export async function getDashboardStats(_,res) {
