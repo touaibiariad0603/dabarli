@@ -27,7 +27,7 @@ Sentry.init({
   // For example, automatic IP address collection on events
   sendDefaultPii: true,
   enableLogs: true,
-
+  
    integrations: [
     Sentry.replayIntegration()
   ],
