@@ -233,10 +233,10 @@ const handleEdit = (product) => {
                   required
                 >
                   <option value="">Select category</option>
-                  <option value="Electronics">Mercedes</option>
-                  <option value="Accessories">Audi</option>
-                  <option value="Fashion">Volkswagen</option>
-                  <option value="Sports">Renault</option>
+                  <option value="Mercedes">Mercedes</option>
+                  <option value="Audi">Audi</option>
+                  <option value="Volkswagen">Volkswagen</option>
+                  <option value="Renault">Renault</option>
                 </select>
               </div>
             </div>
