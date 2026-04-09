@@ -155,7 +155,7 @@ const handleEdit = (product) => {
                     <div className="flex items-center gap-6 mt-4">
                       <div>
                         <p className="text-xs text-base-content/70">Price</p>
-                        <p className="font-bold text-lg">${product.price}</p>
+                        <p className="font-bold text-lg">{product.price}.00 dz</p>
                       </div>
                       <div>
                         <p className="text-xs text-base-content/70">Stock</p>
