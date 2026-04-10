@@ -106,22 +106,22 @@ export async function deleteAddress(req,res) {
 };
 
 
-//whishlist function
+//wishlist function
 export async function addToWishlist(req,res) {
     try {
         const {productId} =req.body;
         const user = req.user
 
-        //check if product is already in whishlist
-        if(user.whishlist.includes(productId)){
-            return res.status(400).json({error:"product already in whishlist",wishlist:user.whishlist});
+        //check if product is already in wishlist
+        if(user.wishlist.includes(productId)){
+            return res.status(400).json({error:"product already in wishlist",wishlist:user.wishlist});
         }
         
-        user.whishlist.push(productId);
+        user.wishlist.push(productId);
         await user.save();
-        res.status(200).json({message:"product added to whishlist",whishlist:user.whishlist});
+        res.status(200).json({message:"product added to wishlist",wishlist:user.wishlist});
     } catch (error) {
-        console.error("Eroor in addToWhishlist controller",error);
+        console.error("Eroor in addToWishlist controller",error);
         res.status(500).json({error:"Internal server error"});
     }
 };
@@ -131,29 +131,29 @@ export async function removeFromWishlist(req,res) {
         const {productId}=req.params;
         const user=req.user;
 
-        if(!user.whishlist.includes(productId)){
-        return res.status(400).json({error:"product not found in whishlist",whishlist:user.whishlist});
+        if(!user.wishlist.includes(productId)){
+        return res.status(400).json({error:"product not found in wishlist",wishlist:user.wishlist});
         }
 
 
-        user.whishlist.pull(productId);
+        user.wishlist.pull(productId);
         await user.save;
 
-        res.status(200).json({message:"product deleted from whishlist",whishlist:user.whishlist})
+        res.status(200).json({message:"product deleted from wishlist",wishlist:user.wishlist})
     } catch (error) {
-        console.error("Eroor in removeFromWhishlist controller",error);
+        console.error("Eroor in removeFromWishlist controller",error);
         res.status(500).json({error:"Internal server error"});
     }
 };
 
-export async function getWhishlist(req,res) {
+export async function getWishlist(req,res) {
     try {
 
-        //we're using populate , bc whislist is just an array of products ids
-        const user= await user.findById(req.user._id).populate("whishlist");
-        res.status(200).json({whishlist: user.whishlist});
+        //we're using populate , bc wislist is just an array of products ids
+        const user= await user.findById(req.user._id).populate("wishlist");
+        res.status(200).json({wishlist: user.wishlist});
     } catch (error) {
-        console.error("Eroor in getWhishlist controller",error);
+        console.error("Eroor in getWishlist controller",error);
         res.status(500).json({error:"Internal server error"});
     }
 };
