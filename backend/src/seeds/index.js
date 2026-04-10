@@ -65,7 +65,7 @@ const products = [
       "A gripping psychological thriller that will keep you on the edge of your seat. New York Times bestseller with over 1 million copies sold.",
     price: 24.99,
     stock: 100,
-    category: "Books",
+    category: "audi",
     images: [
       "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500",
       "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=500",

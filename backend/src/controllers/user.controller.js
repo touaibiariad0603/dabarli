@@ -107,14 +107,14 @@ export async function deleteAddress(req,res) {
 
 
 //whishlist function
-export async function addToWhishlist(req,res) {
+export async function addToWishlist(req,res) {
     try {
         const {productId} =req.body;
         const user = req.user
 
         //check if product is already in whishlist
         if(user.whishlist.includes(productId)){
-            return res.status(400).json({error:"product already in whishlist",whishlist:user.whishlist});
+            return res.status(400).json({error:"product already in whishlist",wishlist:user.whishlist});
         }
         
         user.whishlist.push(productId);
@@ -126,7 +126,7 @@ export async function addToWhishlist(req,res) {
     }
 };
 
-export async function removeFromWhishlist(req,res) {
+export async function removeFromWishlist(req,res) {
     try {
         const {productId}=req.params;
         const user=req.user;
@@ -150,7 +150,7 @@ export async function getWhishlist(req,res) {
     try {
 
         //we're using populate , bc whislist is just an array of products ids
-        const user= await User.findById(req.user._id).populate("whishlist");
+        const user= await user.findById(req.user._id).populate("whishlist");
         res.status(200).json({whishlist: user.whishlist});
     } catch (error) {
         console.error("Eroor in getWhishlist controller",error);
