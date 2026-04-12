@@ -41,7 +41,15 @@
       ],
       "expo-font",
       "expo-image",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "dabarli-app",
+          "organization": "riad-dev"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
