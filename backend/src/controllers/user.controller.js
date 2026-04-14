@@ -1,4 +1,5 @@
 import { User } from "../models/user.model.js";
+import "../models/product.model.js";
 
 export async function addAddress(req, res) {
   try {
@@ -143,6 +144,9 @@ export async function removeFromWishlist(req, res) {
 }
 
 export async function getWishlist(req, res) {
+    console.log("👤 User:", req.user); // ✅ ADD HERE
+    console.log("👤 User ID:", req.user._id); // ✅ ADD HERE
+
   try {
     // we're using populate, bc wishlist is just an array of product ids
     const user = await User.findById(req.user._id).populate("wishlist");

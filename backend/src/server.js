@@ -13,6 +13,10 @@ import productRoutes from "./routes/product.route.js";
 import cartRoutes from "./routes/cart.route.js";
 import { ENV } from "./config/env.js";
 
+import "./models/product.model.js";
+import "./models/user.model.js";
+
+
 
 const app = express();
 
@@ -79,5 +83,6 @@ const startServer = async () => {
     console.error("Failed to start server:", error);
   }
 };
+
 
 startServer();
