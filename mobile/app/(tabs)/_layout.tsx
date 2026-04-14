@@ -19,6 +19,8 @@ const TabsLayout = () => {
         tabBarActiveTintColor: "#F59E0B",
         tabBarInactiveTintColor: "#78716C",
 
+         sceneStyle: { backgroundColor: "#0F0E0C" },
+
         tabBarBackground: () =>
           Platform.OS === "ios" ? (
             <BlurView

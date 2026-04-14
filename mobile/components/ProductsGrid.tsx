@@ -2,6 +2,7 @@ import useCart from "@/hooks/useCart";
 import useWishlist from "@/hooks/useWishlist";
 import { Product } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import {
   ActivityIndicator,
   Alert,
@@ -11,7 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 interface ProductsGridProps {
   isLoading: boolean;
   isError: boolean;
@@ -42,7 +42,7 @@ const { isInWishlist, toggleWishlist, isWishlistPending } = useWishlist();
       className="bg-surface rounded-3xl overflow-hidden mb-3"
       style={{ width: "48%" }}
       activeOpacity={0.8}
-      //onPress={() => router.push(`/product/${product._id}`)}
+      onPress={() => router.push(`/product/${product._id}`)}
     >
       <View className="relative">
         <Image
@@ -84,7 +84,7 @@ const { isInWishlist, toggleWishlist, isWishlistPending } = useWishlist();
         </View>
 
         <View className="flex-row items-center justify-between">
-          <Text className="text-primary font-bold text-lg">${product.price.toFixed(2)}</Text>
+          <Text className="text-primary font-bold text-lg">{product.price.toFixed(2)}dz</Text>
 
           <TouchableOpacity
             className="bg-primary rounded-full w-8 h-8 items-center justify-center"

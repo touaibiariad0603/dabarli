@@ -2,11 +2,10 @@ import ProductsGrid from "@/components/ProductsGrid";
 import SafeScreen from "@/components/SafeScreen";
 import useProducts from "@/hooks/useProducts";
 
-import * as Sentry from "@sentry/react-native";
 
 import { Ionicons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
-import { Button, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 const CATEGORIES = [
   { name: "All", icon: "grid-outline" as const },
@@ -106,7 +105,7 @@ const ShopScreen = () => {
           </ScrollView>
         </View>
 
-        <Button title="try" onPress={()=>{Sentry.captureException(new Error(`First error`))}}/>
+        
 
         <View className="px-6 mb-6">
           <View className="flex-row items-center justify-between mb-4">
