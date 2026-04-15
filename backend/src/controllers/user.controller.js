@@ -1,159 +1,147 @@
-import { User } from "../models/user.model.js";
-import "../models/product.model.js";
+import { Cart } from "../models/cart.model.js";
+import { Product } from "../models/product.model.js";
 
-export async function addAddress(req, res) {
+export async function getCart(req, res) {
   try {
-    const { label, fullName, streetAddress, city, state, zipCode, phoneNumber, isDefault } =
-      req.body;
+    let cart = await Cart.findOne({ clerkId: req.user.clerkId }).populate("items.product");
 
-    const user = req.user;
+    if (!cart) {
+      const user = req.user;
 
-    if (!fullName || !streetAddress || !city || !state || !zipCode) {
-      return res.status(400).json({ error: "Missing required address fields" });
-    }
-
-    // if this is set as default, unset all other defaults
-    if (isDefault) {
-      user.addresses.forEach((addr) => {
-        addr.isDefault = false;
+      cart = await Cart.create({
+        user: user._id,
+        clerkId: user.clerkId,
+        items: [],
       });
     }
 
-    user.addresses.push({
-      label,
-      fullName,
-      streetAddress,
-      city,
-      state,
-      zipCode,
-      phoneNumber,
-      isDefault: isDefault || false,
-    });
-
-    await user.save();
-
-    res.status(201).json({ message: "Address added successfully", addresses: user.addresses });
+    res.status(200).json({ cart });
   } catch (error) {
-    console.error("Error in addAddress controller:", error);
+    console.error("Error in getCart controller:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 }
 
-export async function getAddresses(req, res) {
+export async function addToCart(req, res) {
   try {
-    const user = req.user;
+    const { productId, quantity = 1 } = req.body;
 
-    res.status(200).json({ addresses: user.addresses });
-  } catch (error) {
-    console.error("Error in getAddresses controller:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-}
-
-export async function updateAddress(req, res) {
-  try {
-    const { label, fullName, streetAddress, city, state, zipCode, phoneNumber, isDefault } =
-      req.body;
-
-    const { addressId } = req.params;
-
-    const user = req.user;
-    const address = user.addresses.id(addressId);
-    if (!address) {
-      return res.status(404).json({ error: "Address not found" });
+    // validate product exists and has stock
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
     }
 
-    // if this is set as default, unset all other defaults
-    if (isDefault) {
-      user.addresses.forEach((addr) => {
-        addr.isDefault = false;
+    if (product.stock < quantity) {
+      return res.status(400).json({ error: "Insufficient stock" });
+    }
+
+    let cart = await Cart.findOne({ clerkId: req.user.clerkId });
+
+    if (!cart) {
+      const user = req.user;
+
+      cart = await Cart.create({
+        user: user._id,
+        clerkId: user.clerkId,
+        items: [],
       });
     }
 
-    address.label = label || address.label;
-    address.fullName = fullName || address.fullName;
-    address.streetAddress = streetAddress || address.streetAddress;
-    address.city = city || address.city;
-    address.state = state || address.state;
-    address.zipCode = zipCode || address.zipCode;
-    address.phoneNumber = phoneNumber || address.phoneNumber;
-    address.isDefault = isDefault !== undefined ? isDefault : address.isDefault;
-
-    await user.save();
-
-    res.status(200).json({ message: "Address updated successfully", addresses: user.addresses });
-  } catch (error) {
-    console.error("Error in updateAddress controller:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-}
-
-export async function deleteAddress(req, res) {
-  try {
-    const { addressId } = req.params;
-    const user = req.user;
-
-    user.addresses.pull(addressId);
-    await user.save();
-
-    res.status(200).json({ message: "Address deleted successfully", addresses: user.addresses });
-  } catch (error) {
-    console.error("Error in deleteAddress controller:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-}
-
-export async function addToWishlist(req, res) {
-  try {
-    const { productId } = req.body;
-    const user = req.user;
-
-    // check if product is already in the wishlist
-    if (user.wishlist.includes(productId)) {
-      return res.status(400).json({ error: "Product already in wishlist" });
+    // check if item already in the cart
+    const existingItem = cart.items.find((item) => item.product.toString() === productId);
+    if (existingItem) {
+      // increment quantity by 1
+      const newQuantity = existingItem.quantity + 1;
+      if (product.stock < newQuantity) {
+        return res.status(400).json({ error: "Insufficient stock" });
+      }
+      existingItem.quantity = newQuantity;
+    } else {
+      // add new item
+      cart.items.push({ product: productId, quantity });
     }
 
-    user.wishlist.push(productId);
-    await user.save();
+    await cart.save();
 
-    res.status(200).json({ message: "Product added to wishlist", wishlist: user.wishlist });
+    res.status(200).json({ message: "Item added to cart", cart });
   } catch (error) {
-    console.error("Error in addToWishlist controller:", error);
+    console.error("Error in addToCart controller:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 }
 
-export async function removeFromWishlist(req, res) {
+export async function updateCartItem(req, res) {
   try {
     const { productId } = req.params;
-    const user = req.user;
+    const { quantity } = req.body;
 
-    // check if product is already in the wishlist
-    if (!user.wishlist.includes(productId)) {
-      return res.status(400).json({ error: "Product not found in wishlist" });
+    if (quantity < 1) {
+      return res.status(400).json({ error: "Quantity must be at least 1" });
     }
 
-    user.wishlist.pull(productId);
-    await user.save();
+    const cart = await Cart.findOne({ clerkId: req.user.clerkId });
+    if (!cart) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
 
-    res.status(200).json({ message: "Product removed from wishlist", wishlist: user.wishlist });
+    const itemIndex = cart.items.findIndex((item) => item.product.toString() === productId);
+    if (itemIndex === -1) {
+      return res.status(404).json({ error: "Item not found in cart" });
+    }
+
+    // check if product exists & validate stock
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    if (product.stock < quantity) {
+      return res.status(400).json({ error: "Insufficient stock" });
+    }
+
+    cart.items[itemIndex].quantity = quantity;
+    await cart.save();
+
+    res.status(200).json({ message: "Cart updated successfully", cart });
   } catch (error) {
-    console.error("Error in removeFromWishlist controller:", error);
+    console.error("Error in updateCartItem controller:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 }
 
-export async function getWishlist(req, res) {
-    console.log("👤 User:", req.user); // ✅ ADD HERE
-    console.log("👤 User ID:", req.user._id); // ✅ ADD HERE
-
+export async function removeFromCart(req, res) {
   try {
-    // we're using populate, bc wishlist is just an array of product ids
-    const user = await User.findById(req.user._id).populate("wishlist");
+    const { productId } = req.params;
 
-    res.status(200).json({ wishlist: user.wishlist });
+    const cart = await Cart.findOne({ clerkId: req.user.clerkId });
+    if (!cart) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
+
+    cart.items = cart.items.filter((item) => item.product.toString() !== productId);
+    await cart.save();
+
+    res.status(200).json({ message: "Item removed from cart", cart });
   } catch (error) {
-    console.error("Error in getWishlist controller:", error);
+    console.error("Error in removeFromCart controller:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 }
+
+export const clearCart = async (req, res) => {
+  try {
+    const cart = await Cart.findOne({ clerkId: req.user.clerkId });
+    if (!cart) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
+
+    cart.items = [];
+    await cart.save();
+
+    res.status(200).json({ message: "Cart cleared", cart });
+  } catch (error) {
+    console.error("Error in clearCart controller:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
