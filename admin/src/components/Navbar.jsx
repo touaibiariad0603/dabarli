@@ -2,11 +2,13 @@ import { UserButton } from "@clerk/clerk-react";
 import { useLocation } from "react-router";
 
 
-import { ClipboardListIcon, HomeIcon, ShoppingBagIcon, UsersIcon ,PanelLeftIcon} from "lucide-react";
+import { ClipboardListIcon, HomeIcon, ShoppingBagIcon, UsersIcon ,PanelLeftIcon,ListTreeIcon,FolderTreeIcon} from "lucide-react";
 
 export const NAVIGATION = [
     {name:"Dashboard", path:"/dashboard", icon:<HomeIcon className="size-5"/>},
     {name:"Products", path:"/products", icon:<ShoppingBagIcon className="size-5"/>},
+    {name:"Categories", path:"/categorys", icon:<FolderTreeIcon className="size-5"/>},
+    {name:"Sub Categories", path:"/subcategories", icon:<ListTreeIcon className="size-5"/>},
     {name:"Orders", path:"/orders", icon:<ClipboardListIcon className="size-5"/>},
     {name:"Customers", path:"/customers", icon:<UsersIcon className="size-5"/>},
    
@@ -15,7 +17,7 @@ export const NAVIGATION = [
 function Navbar(){
     const location = useLocation();
 
-
+ 
     return (
         <div className="navbar w-full bg-base-300">
             <label htmlFor="my-drawer" className=" btn btn-square btn-ghost" aria-label="open sidebar">

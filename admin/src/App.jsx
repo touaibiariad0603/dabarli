@@ -9,7 +9,8 @@ import DashboardLayout from "./Layouts/DashboardLayout";
 
 import PageLoader from "./components/PageLoader";
 import { useAxios } from "./lib/useAxios";
-
+import CategorysPage from "./pages/CategorysPage"
+import SubCategoriesPage from "./pages/SubCategoriesPage"
 
 
 function App() {
@@ -25,6 +26,8 @@ function App() {
         <Route index element={<Navigate to={"dashboard"}/>}/>
         <Route path="dashboard" element={<DashboardPage/>}/>
         <Route path="products" element={<ProductsPage/>}/>
+        <Route path="categorys" element={<CategorysPage/>}/>
+        <Route path="subcategories" element={<SubCategoriesPage/>}/>
         <Route path="orders" element={<OrdersPage/>}/>
         <Route path="customers" element={<CustomersPage/>}/>
   

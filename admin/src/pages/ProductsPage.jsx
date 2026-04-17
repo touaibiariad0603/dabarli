@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PlusIcon, PencilIcon, Trash2Icon, XIcon, ImageIcon } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { productApi } from "../lib/api";
+import { productApi, categoryApi ,subcategoryApi} from "../lib/api";
 import { getStockStatusBadge } from "../lib/utils";
 
 
@@ -11,6 +11,7 @@ function ProductsPage() {
   const [formData, setFormData] = useState({
     name: "",
     category: "",
+    subcategory: "",
     price: "",
     stock: "",
     description: "",
@@ -24,6 +25,16 @@ function ProductsPage() {
   const { data: products = [] } = useQuery({
     queryKey: ["products"],
     queryFn: productApi.getAll,
+  });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categorys"],
+    queryFn: categoryApi.getAll,
+  });
+
+  const { data: subcategories = [] } = useQuery({
+    queryKey: ["SubCategories"],
+    queryFn: subcategoryApi.getAll,
   });
 
   // creating, update, deleting
@@ -56,6 +67,7 @@ const deleteProductMutation = useMutation({
     setFormData({
       name: "",
       category: "",
+      subcategory: "",
       price: "",
       stock: "",
       description: "",
@@ -68,7 +80,8 @@ const handleEdit = (product) => {
   setEditingProduct(product);
   setFormData({
     name: product.name ?? "",
-    category: product.category ?? "",
+    category: product.category?._id ?? "",
+    subcategory: product.subcategory?._id ?? "",
     price: (product.price ?? 0).toString(),
     stock: (product.stock ?? 0).toString(),
     description: product.description ?? "",
@@ -104,7 +117,9 @@ const handleEdit = (product) => {
     formDataToSend.append("price", formData.price);
     formDataToSend.append("stock", formData.stock);
     formDataToSend.append("category", formData.category);
+    formDataToSend.append("subcategory", formData.subcategory);
 
+  
     // only append new images if they were selected
     if (images.length > 0) images.forEach((image) => formDataToSend.append("images", image));
 
@@ -114,6 +129,13 @@ const handleEdit = (product) => {
       createProductMutation.mutate(formDataToSend);
     }
   };
+
+  const filteredSubcategories = subcategories.filter(
+  (sub) =>
+    (typeof sub.category === "string"
+      ? sub.category
+      : sub.category?._id) === formData.category
+);
 
   return (
     <div className="space-y-6">
@@ -148,7 +170,7 @@ const handleEdit = (product) => {
                     <div className="flex items-start justify-between">
                       <div>
                         <h3 className="card-title">{product.name}</h3>
-                        <p className="text-base-content/70 text-sm">{product.category}</p>
+                        <p className="text-base-content/70 text-sm">{product.category?.name}</p>
                       </div>
                       <div className={`badge ${status.class}`}>{status.text}</div>
                     </div>
@@ -229,14 +251,32 @@ const handleEdit = (product) => {
                 <select
                   className="select select-bordered"
                   value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value , subcategory: ""})}
                   required
                 >
-                  <option value="">Select category</option>
-                  <option value="Mercedes">Mercedes</option>
-                  <option value="Audi">Audi</option>
-                  <option value="Volkswagen">Volkswagen</option>
-                  <option value="Renault">Renault</option>
+                    <option value="">Select category</option>
+                    {categories.map((cat)=>(
+                      <option key={cat._id} value={cat._id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                </select>
+                <label className="label">
+                  <span>Sub Category</span>
+                </label>
+                <select
+                  className="select select-bordered"
+                  value={formData.subcategory}
+                  onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
+                  required
+                  disabled={!formData.category} 
+                >
+                    <option value="">Select sub category</option>
+                    {filteredSubcategories.map((sub) =>(
+                      <option key={sub._id} value={sub._id}>
+                        {sub.name}
+                      </option>
+                    ))}
                 </select>
               </div>
             </div>

@@ -22,6 +22,58 @@ export const productApi = {
   },
 };
 
+
+export const categoryApi = {
+  getAll: async () => {
+    const { data } = await axiosInstance.get("/admin/categorys");
+    return data;
+  },
+
+  create: async (formData) => {
+    const { data } = await axiosInstance.post("/admin/categorys", formData);
+    return data;
+  },
+
+  update: async ({ id, formData }) => {
+    const { data } = await axiosInstance.put(`/admin/categorys/${id}`, formData);
+    return data;
+  },
+
+  delete: async (productId) => {
+    const { data } = await axiosInstance.delete(`/admin/categorys/${productId}`);
+    return data;
+  },
+};
+
+
+
+
+export const subcategoryApi = {
+  getAll: async () => {
+    const { data } = await axiosInstance.get("/admin/subcategories");
+    return data;
+  },
+
+  create: async (formData) => {
+    const { data } = await axiosInstance.post("/admin/subcategories", formData);
+    return data;
+  },
+
+  update: async ({ id, formData }) => {
+    const { data } = await axiosInstance.put(`/admin/subcategories/${id}`, formData);
+    return data;
+  },
+
+  delete: async (productId) => {
+    const { data } = await axiosInstance.delete(`/admin/subcategories/${productId}`);
+    return data;
+  },
+};
+
+
+
+
+
 export const orderApi = {
   getAll: async () => {
     const { data } = await axiosInstance.get("/admin/orders");
