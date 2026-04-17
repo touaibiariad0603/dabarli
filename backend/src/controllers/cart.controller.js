@@ -3,7 +3,8 @@ import { Product } from "../models/product.model.js";
 
 export async function getCart(req, res) {
   try {
-    let cart = await Cart.findOne({ clerkId: req.user.clerkId }).populate("items.product");
+    let cart = await Cart.findOne({ clerkId: req.user.clerkId })
+      .populate("items.product");
 
     if (!cart) {
       const user = req.user;
@@ -13,6 +14,14 @@ export async function getCart(req, res) {
         clerkId: user.clerkId,
         items: [],
       });
+    }
+
+    const originalLength = cart.items.length;
+
+    cart.items = cart.items.filter(item => item.product !== null);
+
+    if (cart.items.length !== originalLength) {
+      await cart.save();
     }
 
     res.status(200).json({ cart });
@@ -137,6 +146,7 @@ export const clearCart = async (req, res) => {
     }
 
     cart.items = [];
+    cart.items = cart.items.filter(item => item.product !== null);
     await cart.save();
 
     res.status(200).json({ message: "Cart cleared", cart });
