@@ -157,7 +157,7 @@ export async function createCategory(req, res) {
 
     const uploadPromises = req.files.map((file) => {
       return cloudinary.uploader.upload(file.path, {
-        folder: "categorys",
+        folder: "categories",
       });
     });
 
@@ -199,7 +199,7 @@ export async function updateCategory(req, res) {
 
       const uploadPromises = req.files.map((file) => {
         return cloudinary.uploader.upload(file.path, {
-          folder: "categorys",
+          folder: "categories",
         });
       });
 
@@ -210,19 +210,19 @@ export async function updateCategory(req, res) {
     await category.save();
     res.status(200).json(category);
   } catch (error) {
-    console.error("Error updating categorys:", error);
+    console.error("Error updating categories:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
 
 
-export async function getAllCategorys(_, res) {
+export async function getAllcategories(_, res) {
   try {
-    // -1 means in desc order: most recent categorys first
-    const categorys = await Category.find().sort({ createdAt: -1 });
-    res.status(200).json(categorys);
+    // -1 means in desc order: most recent categories first
+    const categories = await Category.find().sort({ createdAt: -1 });
+    res.status(200).json(categories);
   } catch (error) {
-    console.error("Error fetching categorys:", error);
+    console.error("Error fetching categories:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -302,9 +302,9 @@ export async function updateSubCategory(req, res) {
 
 
 
-export async function getAllSubCategorys(_, res) {
+export async function getAllSubCategories(_, res) {
   try {
-    // -1 means in desc order: most recent subcategorys first
+    // -1 means in desc order: most recent subcategories first
     const subcategories = await SubCategory.find()
     .populate("category")
     .sort({ createdAt: -1 });
@@ -490,7 +490,7 @@ export const deleteCategory = async (req, res) => {
     if (category.images && category.images.length > 0) {
       const deletePromises = category.images.map((imageUrl) => {
         // Extract public_id from URL (assumes format: .../category/publicId.ext)
-        const publicId = "categorys/" + imageUrl.split("/categorys/")[1]?.split(".")[0];
+        const publicId = "categories/" + imageUrl.split("/categories/")[1]?.split(".")[0];
         if (publicId) return cloudinary.uploader.destroy(publicId);
       });
       await Promise.all(deletePromises.filter(Boolean));
