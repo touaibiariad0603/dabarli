@@ -17,8 +17,8 @@ function CategorysPage() {
   const queryClient = useQueryClient();
 
   // fetch some data
-  const { data: categorys = [] } = useQuery({
-    queryKey: ["categorys"],
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
     queryFn: categoryApi.getAll,
   });
 
@@ -27,7 +27,7 @@ function CategorysPage() {
     mutationFn: categoryApi.create,
     onSuccess: () => {
       closeModal();
-      queryClient.invalidateQueries({ queryKey: ["categorys"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
   });
 
@@ -35,14 +35,14 @@ function CategorysPage() {
     mutationFn: categoryApi.update,
     onSuccess: () => {
       closeModal();
-      queryClient.invalidateQueries({ queryKey: ["categorys"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
   });
 
 const deleteCategoryMutation = useMutation({
   mutationFn: categoryApi.delete,
   onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ["categorys"] });
+    queryClient.invalidateQueries({ queryKey: ["categories"] });
   },
 });
   const closeModal = () => {
@@ -116,7 +116,7 @@ const handleEdit = (category) => {
 
       {/* Cat GRID */}
       <div className="grid grid-cols-1 gap-4">
-        {categorys?.map((category) => {
+        {categories?.map((category) => {
 
           return (
             <div key={category._id} className="card bg-base-100 shadow-xl">

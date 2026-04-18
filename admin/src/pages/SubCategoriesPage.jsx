@@ -22,7 +22,7 @@ function SubCategoriesPage() {
   });
 
   const { data: categories = [] } = useQuery({
-    queryKey: ["categorys"],
+    queryKey: ["categories"],
     queryFn: categoryApi.getAll,
   });
 

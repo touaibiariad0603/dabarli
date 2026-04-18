@@ -25,22 +25,22 @@ export const productApi = {
 
 export const categoryApi = {
   getAll: async () => {
-    const { data } = await axiosInstance.get("/admin/categorys");
+    const { data } = await axiosInstance.get("/admin/categories");
     return data;
   },
 
   create: async (formData) => {
-    const { data } = await axiosInstance.post("/admin/categorys", formData);
+    const { data } = await axiosInstance.post("/admin/categories", formData);
     return data;
   },
 
   update: async ({ id, formData }) => {
-    const { data } = await axiosInstance.put(`/admin/categorys/${id}`, formData);
+    const { data } = await axiosInstance.put(`/admin/categories/${id}`, formData);
     return data;
   },
 
   delete: async (productId) => {
-    const { data } = await axiosInstance.delete(`/admin/categorys/${productId}`);
+    const { data } = await axiosInstance.delete(`/admin/categories/${productId}`);
     return data;
   },
 };
