@@ -1,6 +1,6 @@
 import { SubCategory } from "../models/SubCategory.model.js";
 
-export async function getCategoryById(req,res) {
+export async function getSubCategoryById(req,res) {
     try{
         const {id}=req.params;
         const subcategory= await SubCategory.findById(id);
