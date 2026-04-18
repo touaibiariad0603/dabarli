@@ -278,7 +278,7 @@ export async function updateSubCategory(req, res) {
 
     if (name) subcategory.name = name;
     if (category) {
-      const categoryExists = await SubCategory.findById(category);
+      const categoryExists = await Category.findById(category);
       if (!categoryExists) {
         return res.status(404).json({ message: "Category not found" });
       }
@@ -288,7 +288,7 @@ export async function updateSubCategory(req, res) {
     await subcategory.save();
 
    
-    const populatedSubCategory = await subcategory.populate("subcategory");
+    const populatedSubCategory = await subcategory.populate("category");
 
     res.status(200).json(populatedSubCategory);
   } catch (error) {
