@@ -28,27 +28,13 @@ image:{
 }
 });
 
-const shippingAdressSchema = new mongoose.Schema({
-    fullName:{
-        type:String,
-        required:true,
-    },
-    city:{
-        type:String,
-        required:true,
-    },
-    state:{
-        type:String,
-        required:true,
-    },
-    zipCode:{
-        type:String,
-        required:true,
-    },
-    phoneNumber:{
-        type:String,
-        required:true,
-    },
+const shippingAddressSchema = new mongoose.Schema({
+  fullName:      { type: String, required: true },
+  streetAddress: { type: String, required: true }, 
+  city:          { type: String, required: true },
+  state:         { type: String, required: true },
+  zipCode:       { type: String, required: true },
+  phoneNumber:   { type: String, required: true },
 });
 const orderSchema = new mongoose.Schema({
 user:{
@@ -61,10 +47,7 @@ clerkId:{
     required:true,
 },
 orderItems:[orderItemSchema],
-shippingAdress : {
-    type: shippingAdressSchema,
-    required:true
-},
+shippingAddress: { type: shippingAddressSchema, required: true },
 paymentResult: {
     id:String,
     status:String,
