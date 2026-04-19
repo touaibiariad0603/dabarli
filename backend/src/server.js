@@ -62,7 +62,7 @@ app.use("/api/categories",categoryRoutes);
 app.use("/api/subcategories",SubCategoryRoutes);
 app.use("/api/cart",cartRoutes);
 app.use("/api/payment",paymentRoutes)
-app.use("/api/slickpay",slickpayRoutes)
+app.use("/api/slickpay",SlickpayRoutes)
 
 
 // Root route
