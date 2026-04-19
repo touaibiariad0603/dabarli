@@ -59,10 +59,15 @@ export async function createSlickPayInvoice(req, res) {
       invoiceId: data.id,
       checkoutUrl: data.url,  // ← send this to the app to open in browser
     });
-  } catch (error) {
-    console.error("SlickPay create invoice error:", error?.response?.data || error.message);
-    return res.status(500).json({ error: "Failed to create SlickPay invoice" });
-  }
+  }catch (error) {
+  console.error("SlickPay create invoice error:", 
+    JSON.stringify(error?.response?.data) || error.message
+  );
+  return res.status(500).json({ 
+    error: "Failed to create SlickPay invoice",
+    details: error?.response?.data  // ← add this so frontend can see it
+  });
+}
 }
 
 // GET /payment/slickpay/status/:invoiceId
