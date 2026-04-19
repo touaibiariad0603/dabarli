@@ -2,9 +2,10 @@ import { Order } from "../models/order.model.js";
 import { Product } from "../models/product.model.js";
 import {Review} from "../models/review.model.js"
 
+
 export async function createOrders(req,res) {
     try {
-        const user = req.body;
+        const user = req.user;
         const {orderItems,shippingAddress,paymentResult,totalPrice}=req.body;
 
         if(!orderItems || orderItems.length === 0){
@@ -34,7 +35,7 @@ export async function createOrders(req,res) {
 
         // update product stock
         for(const item of orderItems){
-            await product.findByIdAndUpdate(item.product._id,{
+            await Product.findByIdAndUpdate(item.product._id,{
                 $inc:{stock:-item.quantity},
             });
         }
@@ -55,7 +56,7 @@ export async function getUserOrders(req,res) {
         .sort({createdAt:-1});
 
         //check if each order has been reviewd
-        const orderIds = order.map((order)=>order._id);
+        const orderIds = orders.map((order)=>order._id);
         const reviews = await Review.find({orderId:{$in:orderIds}});
         const reviewOrderIds = new Set(reviews.map((review)=>review.orderId.toString()));
 
