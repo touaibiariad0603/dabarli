@@ -8,7 +8,6 @@ import {
 
 const router = Router();
 
-
 router.post("/webhook", slickPayWebhook);
 
 router.use(protectRoute);
