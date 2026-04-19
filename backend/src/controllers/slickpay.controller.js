@@ -8,8 +8,9 @@ const SLICKPAY_BASE =
 const headers = () => ({
   Accept: "application/json",
   "Content-Type": "application/json",
+  "User-Agent": "Mozilla/5.0 (compatible; Dabarli/1.0)",
   Authorization: `Bearer ${process.env.SLICKPAY_PUBLIC_KEY}`,
-});
+});;
 
 // POST /payment/slickpay/create-invoice
 export async function createSlickPayInvoice(req, res) {
@@ -59,13 +60,17 @@ export async function createSlickPayInvoice(req, res) {
       invoiceId: data.id,
       checkoutUrl: data.url,  // ← send this to the app to open in browser
     });
-  }catch (error) {
-  console.error("SlickPay create invoice error:", 
-    JSON.stringify(error?.response?.data) || error.message
-  );
+  } catch (error) {
+  const responseData = error?.response?.data;
+  const isHtml = typeof responseData === "string" && responseData.includes("<html");
+  
+  console.error("SlickPay error:", isHtml ? "Cloudflare blocked the request" : responseData);
+  
   return res.status(500).json({ 
-    error: "Failed to create SlickPay invoice",
-    details: error?.response?.data  // ← add this so frontend can see it
+    error: isHtml 
+      ? "SlickPay API blocked the request (Cloudflare)" 
+      : "Failed to create SlickPay invoice",
+    details: isHtml ? "Server IP is blocked" : responseData
   });
 }
 }
