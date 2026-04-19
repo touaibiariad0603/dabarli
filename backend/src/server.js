@@ -14,6 +14,7 @@ import categoryRoutes from "./routes/category.route.js";
 import SubCategoryRoutes from "./routes/SubCategory.route.js";
 import cartRoutes from "./routes/cart.route.js";
 import paymentRoutes from "./routes/payment.route.js";
+import slickpayRoutes from "./routes/Slickpay.route.js";
 import { ENV } from "./config/env.js";
 
 import "./models/product.model.js";
@@ -61,6 +62,7 @@ app.use("/api/categories",categoryRoutes);
 app.use("/api/subcategories",SubCategoryRoutes);
 app.use("/api/cart",cartRoutes);
 app.use("/api/payment",paymentRoutes)
+app.use("/api/slickpay",slickpayRoutes)
 
 
 // Root route
