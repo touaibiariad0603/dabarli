@@ -158,19 +158,3 @@ export async function getWishlist(req, res) {
   }
 }
 
-export async function getUserOrders(req, res) {
-  try {
-    const orders = await Order.find({ clerkId: req.user.clerkId })
-      .populate("orderItems.Product") 
-      .sort({ createdAt: -1 });
-
-    res.status(200).json({ orders });
-
-  } catch (error) {
-    console.error("🔥 getUserOrders ERROR:", error);
-
-    res.status(500).json({
-      error: error.message,
-    });
-  }
-}

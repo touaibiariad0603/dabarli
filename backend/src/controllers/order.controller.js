@@ -23,7 +23,7 @@ export async function createOrders(req, res) {
 
    
     const mappedOrderItems = orderItems.map((item) => ({
-      Product:  item.product._id,
+      product:  item.product._id,
       name:     item.product.name,
       price:    item.product.price,
       quantity: item.quantity,
