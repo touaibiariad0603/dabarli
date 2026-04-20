@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addAddress,getAddresses,updateAddress,deleteAddress,addToWishlist,removeFromWishlist,getWishlist } from "../controllers/user.controller.js";
+import { addAddress,getAddresses,updateAddress,deleteAddress,addToWishlist,removeFromWishlist,getWishlist, getUserOrders } from "../controllers/user.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router = Router();
@@ -17,6 +17,9 @@ router.delete("/addresses/:addressId",deleteAddress);
 router.post("/wishlist",addToWishlist);
 router.delete("/wishlist/:productId",removeFromWishlist);
 router.get("/wishlist",getWishlist);
+
+
+router.get("/wishlist",getUserOrders);
 
 
 export default router

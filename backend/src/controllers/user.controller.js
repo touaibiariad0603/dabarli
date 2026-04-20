@@ -144,8 +144,8 @@ export async function removeFromWishlist(req, res) {
 }
 
 export async function getWishlist(req, res) {
-    console.log("👤 User:", req.user); // ✅ ADD HERE
-    console.log("👤 User ID:", req.user._id); // ✅ ADD HERE
+    console.log("👤 User:", req.user); 
+    console.log("👤 User ID:", req.user._id); //
 
   try {
     // we're using populate, bc wishlist is just an array of product ids
@@ -155,5 +155,22 @@ export async function getWishlist(req, res) {
   } catch (error) {
     console.error("Error in getWishlist controller:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+export async function getUserOrders(req, res) {
+  try {
+    const orders = await Order.find({ clerkId: req.user.clerkId })
+      .populate("orderItems.Product") 
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ orders });
+
+  } catch (error) {
+    console.error("🔥 getUserOrders ERROR:", error);
+
+    res.status(500).json({
+      error: error.message,
+    });
   }
 }
