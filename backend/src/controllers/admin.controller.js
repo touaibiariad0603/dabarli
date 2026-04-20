@@ -349,19 +349,13 @@ export async function getAllOrders(_, res) {
   try {
     const orders = await Order.find()
       .populate("user", "name email")
-      .populate("orderItems.Product")
+      .populate("orderItems.product")
       .sort({ createdAt: -1 });
 
     res.status(200).json({ orders });
-
   } catch (error) {
-    console.error("🔥 getAllOrders ERROR:", error);
-
-    return res.status(500).json({
-      error: error.message,
-      name: error.name,
-      code: error.code,
-    });
+    console.error("Error in getAllOrders controller:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 }
 

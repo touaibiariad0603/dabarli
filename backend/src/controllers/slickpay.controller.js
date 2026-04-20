@@ -35,7 +35,7 @@ export async function createSlickPayInvoice(req, res) {
 
     const payload = {
       amount: Math.round(totalPrice),
-      url: process.env.SLICKPAY_RETURN_URL,          // deep-link back to the app
+      url: process.env.SLICKPAY_RETURN_URL,          
       items,
       firstname,
       lastname,
