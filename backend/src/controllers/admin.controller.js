@@ -347,27 +347,22 @@ export const deleteSubCategory = async (req, res) => {
 
 export async function getAllOrders(_, res) {
   try {
-  const orders = await Order.find()
-  .populate("user", "name email")
-  .populate("orderItems.Product")
-  .sort({ createdAt: -1 });
+    const orders = await Order.find()
+      .populate("user", "name email")
+      .populate("orderItems.Product")
+      .sort({ createdAt: -1 });
 
-  const normalizedOrders = orders.map(order => {
-  const obj = order.toObject();
+    res.status(200).json({ orders });
 
-  obj.orderItems = obj.orderItems.map(item => ({
-    ...item,
-    product: item.Product, // 👈 map to frontend expectation
-  }));
+  } catch (error) {
+    console.error("🔥 getAllOrders ERROR:", error);
 
-  return obj;
-});
-
-    res.status(200).json({ orders: normalizedOrders });
-} catch (error) {
-  console.error("getAllOrders ERROR:", error); 
-  res.status(500).json({ error: error.message });
-}
+    return res.status(500).json({
+      error: error.message,
+      name: error.name,
+      code: error.code,
+    });
+  }
 }
 
 export async function updateOrderStatus(req, res) {
