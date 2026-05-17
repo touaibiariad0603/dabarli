@@ -19,12 +19,21 @@ export async function createDiagnosticScan(req, res) {
       code: { $in: normalizedCodes },
     });
 
-    const recommendedProducts = await Product.find({
-      $or: normalizedCodes.map((code) => ({
-        description: { $regex: code, $options: "i" },
-      })),
-    }).limit(10);
+    const mappings = await DiagnosticRecommendation.find({
+  code: { $in: normalizedCodes },
+});
 
+const keywords = mappings.flatMap((item) => item.keywords);
+
+let recommendedProducts = [];
+
+if (keywords.length > 0) {
+  recommendedProducts = await Product.find({
+    $or: keywords.map((keyword) => ({
+      name: { $regex: keyword, $options: "i" },
+    })),
+  }).limit(10);
+}
     const scan = await DiagnosticScan.create({
       //user: req.user?._id,
       user: "681f1b1b1b1b1b1b1b1b1b1b",

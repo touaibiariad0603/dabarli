@@ -22,6 +22,7 @@ import "./models/product.model.js";
 import "./models/user.model.js";
 import "./models/diagnosticCode.model.js";
 import "./models/diagnosticScan.model.js";
+import "./models/diagnosticRecommendation.model.js";
 
 
 const app = express();
