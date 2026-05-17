@@ -16,10 +16,12 @@ import cartRoutes from "./routes/cart.route.js";
 import paymentRoutes from "./routes/payment.route.js";
 import SlickpayRoutes from "./routes/Slickpay.route.js";
 import { ENV } from "./config/env.js";
+import diagnosticRoutes from "./routes/diagnostic.route.js";
 
 import "./models/product.model.js";
 import "./models/user.model.js";
-
+import "./models/diagnosticCode.model.js";
+import "./models/diagnosticScan.model.js";
 
 
 const app = express();
@@ -63,6 +65,8 @@ app.use("/api/subcategories",SubCategoryRoutes);
 app.use("/api/cart",cartRoutes);
 app.use("/api/payment",paymentRoutes)
 app.use("/api/slickpay",SlickpayRoutes)
+app.use("/api/products", productRoutes);
+app.use("/api/diagnostics", diagnosticRoutes);
 
 
 // Root route
@@ -76,7 +80,7 @@ app.get("/api/health", (req, res) => {
 });
 
 
-
+app.use("/api/diagnostic", diagnosticRoutes);
 const PORT = process.env.PORT || 3000;
 
 // Start server

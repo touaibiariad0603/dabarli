@@ -90,6 +90,19 @@ const TabsLayout = () => {
           ),
         }}
       />
+    <Tabs.Screen
+        name="diagnostic"
+        options={{
+        title: "Diagnostic",
+        tabBarIcon: ({ color, size }) => (
+        <Ionicons
+        name="car-sport"
+        size={size}
+        color={color}
+      />
+    ),
+  }}
+/>
     </Tabs>
   );
 };

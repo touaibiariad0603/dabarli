@@ -115,3 +115,29 @@ export interface Cart {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface DiagnosticCode {
+  _id: string;
+  code: string;
+  description: string;
+  severity: "low" | "medium" | "high" | "critical";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface VehicleInfo {
+  brand: string;
+  model: string;
+  year: number;
+  vin: string;
+}
+
+export interface DiagnosticScan {
+  _id: string;
+  user: string;
+  vehicleInfo: VehicleInfo;
+  diagnosticCodes: DiagnosticCode[];
+  recommendedProducts: Product[];
+  createdAt: string;
+  updatedAt: string;
+}
