@@ -70,7 +70,7 @@ const { isInWishlist, toggleWishlist, isWishlistPending } = useWishlist();
       </View>
 
       <View className="p-3">
-        <Text className="text-text-secondary text-xs mb-1">{product.category}</Text>
+        <Text className="text-text-secondary text-xs mb-1">{product.category.name}</Text>
         <Text className="text-text-primary font-bold text-sm mb-2" numberOfLines={2}>
           {product.name}
         </Text>

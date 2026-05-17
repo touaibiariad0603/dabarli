@@ -50,11 +50,20 @@ const useCart = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["cart"] }),
   });
 
-  const cartTotal =
-    cart?.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0) ?? 0;
+const items = Array.isArray(cart?.items) ? cart.items : [];
 
-  const cartItemCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
+const safeItems = items.filter(item => item?.product);
 
+const cartTotal = safeItems.reduce(
+  (sum, item) =>
+    sum + (item.product?.price || 0) * item.quantity,
+  0
+);
+
+const cartItemCount = safeItems.reduce(
+  (sum, item) => sum + item.quantity,
+  0
+);
   return {
     cart,
     isLoading,

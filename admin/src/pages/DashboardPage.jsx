@@ -21,7 +21,7 @@ function DashboardPage() {
     const statsCards = [
       {
         name:"Total Revenue",
-        value: statsLoading ? "..." : `$${statsData?.totalRevenue?.toFixed(2) || 0}`,
+        value: statsLoading ? "..." : `${statsData?.totalRevenue?.toFixed(2) || 0}dz`,
         icon:<DollarSignIcon className="size-8"/>,
       },
       {
@@ -104,9 +104,9 @@ function DashboardPage() {
                       </td>
 
                       <td>
-                        <span className="font-semibold">${order.totalPrice.toFixed(2)}</span>
+                        <span className="font-semibold">{order.totalPrice.toFixed(2)}dz</span>
                       </td>
-
+                      
                       <td>
                         <div className={`badge ${getOrderStatusBadge(order.status)}`}>
                           {capitalizeText(order.status)}

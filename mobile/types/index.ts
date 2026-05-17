@@ -1,10 +1,27 @@
+export interface Category {
+  _id: string;
+  name: string;
+  images: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SubCategory {
+  _id: string;
+  name: string;
+  category: Category;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Product {
   _id: string;
   name: string;
   description: string;
   price: number;
   stock: number;
-  category: string;
+  category: Category;
+  subcategory: SubCategory;
   images: string[];
   averageRating: number;
   totalReviews: number;
@@ -23,6 +40,11 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
+export interface OrderUser {
+  _id: string;
+  name: string;
+  email: string;
+}
 
 export interface Address {
   _id: string;
@@ -37,11 +59,11 @@ export interface Address {
 }
 
 export interface Order {
-  _id: string;
-  user: string;
-  clerkId: string;
-  orderItems: OrderItem[];
-  shippingAddress: {
+    _id: string;
+    user:OrderUser;
+    clerkId: string;
+    orderItems: OrderItem[];
+    shippingAddress: {
     fullName: string;
     streetAddress: string;
     city: string;

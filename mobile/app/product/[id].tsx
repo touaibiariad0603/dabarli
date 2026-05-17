@@ -120,7 +120,7 @@ const ProductDetailScreen = () => {
           {/* Category */}
           <View className="flex-row items-center mb-3">
             <View className="bg-primary/20 px-3 py-1 rounded-full">
-              <Text className="text-primary text-xs font-bold">{product.category}</Text>
+              <Text className="text-primary text-xs font-bold">{product.category.name}</Text>
             </View>
           </View>
 
