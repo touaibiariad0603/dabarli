@@ -7,6 +7,7 @@ import {
   UsersIcon,
 } from "lucide-react";
 import { capitalizeText, formatDate, getOrderStatusBadge } from "../lib/utils";
+import { formatPrice } from "../components/format-price";
 
 function DashboardPage() {
   const { data: ordersData, isLoading: ordersLoading } = useQuery({
@@ -26,7 +27,7 @@ function DashboardPage() {
       name: "Total Revenue",
       value: statsLoading
         ? "..."
-        : `${statsData?.totalRevenue?.toFixed(2) || 0}dz`,
+        : formatPrice(statsData?.totalRevenue?.toFixed(2) || 0),
       icon: <DollarSignIcon className="size-8" />,
     },
     {
