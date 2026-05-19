@@ -25,7 +25,7 @@ function DashboardPage() {
   const statsCards = [
     {
       name: "Total Revenue",
-      value: statsLoading ? "..." : statsData?.totalRevenue || 0,
+      value: statsLoading ? "..." : formatPrice(statsData?.totalRevenue),
       icon: <DollarSignIcon className="size-8" />,
     },
     {
