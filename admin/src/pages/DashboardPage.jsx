@@ -6,7 +6,6 @@ import {
   ShoppingBagIcon,
   UsersIcon,
 } from "lucide-react";
-import { formatPrice } from "../components/format-price";
 import { capitalizeText, formatDate, getOrderStatusBadge } from "../lib/utils";
 
 function DashboardPage() {
@@ -27,7 +26,7 @@ function DashboardPage() {
       name: "Total Revenue",
       value: statsLoading
         ? "..."
-        : `"${formatPrice(statsData?.totalRevenue?.toFixed(2) || 0)}"`,
+        : `${statsData?.totalRevenue?.toFixed(2) || 0}dz`,
       icon: <DollarSignIcon className="size-8" />,
     },
     {
