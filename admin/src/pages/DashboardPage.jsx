@@ -26,7 +26,11 @@ function DashboardPage() {
     {
       name: "Total Revenue",
       value: statsLoading ? "..." : formatPrice(statsData?.totalRevenue),
-      icon: <DollarSignIcon className="size-8" />,
+      icon: (
+        <span className="text-2xl font-bold leading-none">
+          <span className="text-primary color-primary">Dz</span>
+        </span>
+      ),
     },
     {
       name: "Total Orders",
