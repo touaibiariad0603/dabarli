@@ -88,7 +88,7 @@ function ProductsPage() {
       name: product.name ?? "",
       category: product.category?._id ?? "",
       subcategory: product.subcategory?._id ?? "",
-      price: formatPrice(product.price ?? 0),
+      price: (product.price ?? 0).toString(),
       stock: (product.stock ?? 0).toString(),
       description: product.description ?? "",
     });
@@ -194,7 +194,9 @@ function ProductsPage() {
                     <div className="flex items-center gap-6 mt-4">
                       <div>
                         <p className="text-xs text-base-content/70">Price</p>
-                        <p className="font-bold text-lg">{product.price}</p>
+                        <p className="font-bold text-lg">
+                          {formatPrice(product.price)}
+                        </p>
                       </div>
                       <div>
                         <p className="text-xs text-base-content/70">Stock</p>
