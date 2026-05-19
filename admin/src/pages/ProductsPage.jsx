@@ -1,9 +1,15 @@
 import { useState } from "react";
-import { PlusIcon, PencilIcon, Trash2Icon, XIcon, ImageIcon } from "lucide-react";
+import {
+  PlusIcon,
+  PencilIcon,
+  Trash2Icon,
+  XIcon,
+  ImageIcon,
+} from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { productApi, categoryApi ,subcategoryApi} from "../lib/api";
+import { productApi, categoryApi, subcategoryApi } from "../lib/api";
 import { getStockStatusBadge } from "../lib/utils";
-
+import { formatPrice } from "../components/format-price.jsx";
 
 function ProductsPage() {
   const [showModal, setShowModal] = useState(false);
@@ -54,12 +60,12 @@ function ProductsPage() {
     },
   });
 
-const deleteProductMutation = useMutation({
-  mutationFn: productApi.delete,
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ["products"] });
-  },
-});
+  const deleteProductMutation = useMutation({
+    mutationFn: productApi.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
   const closeModal = () => {
     // reset the state
     setShowModal(false);
@@ -76,19 +82,19 @@ const deleteProductMutation = useMutation({
     setImagePreviews([]);
   };
 
-const handleEdit = (product) => {
-  setEditingProduct(product);
-  setFormData({
-    name: product.name ?? "",
-    category: product.category?._id ?? "",
-    subcategory: product.subcategory?._id ?? "",
-    price: (product.price ?? 0).toString(),
-    stock: (product.stock ?? 0).toString(),
-    description: product.description ?? "",
-  });
-  setImagePreviews(product.images ?? []);
-  setShowModal(true);
-};
+  const handleEdit = (product) => {
+    setEditingProduct(product);
+    setFormData({
+      name: product.name ?? "",
+      category: product.category?._id ?? "",
+      subcategory: product.subcategory?._id ?? "",
+      price: formatPrice(product.price ?? 0),
+      stock: (product.stock ?? 0).toString(),
+      description: product.description ?? "",
+    });
+    setImagePreviews(product.images ?? []);
+    setShowModal(true);
+  };
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -119,23 +125,25 @@ const handleEdit = (product) => {
     formDataToSend.append("category", formData.category);
     formDataToSend.append("subcategory", formData.subcategory);
 
-  
     // only append new images if they were selected
-    if (images.length > 0) images.forEach((image) => formDataToSend.append("images", image));
+    if (images.length > 0)
+      images.forEach((image) => formDataToSend.append("images", image));
 
     if (editingProduct) {
-      updateProductMutation.mutate({ id: editingProduct._id, formData: formDataToSend });
+      updateProductMutation.mutate({
+        id: editingProduct._id,
+        formData: formDataToSend,
+      });
     } else {
       createProductMutation.mutate(formDataToSend);
     }
   };
 
   const filteredSubcategories = subcategories.filter(
-  (sub) =>
-    (typeof sub.category === "string"
-      ? sub.category
-      : sub.category?._id) === formData.category
-);
+    (sub) =>
+      (typeof sub.category === "string" ? sub.category : sub.category?._id) ===
+      formData.category,
+  );
 
   return (
     <div className="space-y-6">
@@ -143,9 +151,14 @@ const handleEdit = (product) => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Products</h1>
-          <p className="text-base-content/70 mt-1">Manage your product inventory</p>
+          <p className="text-base-content/70 mt-1">
+            Manage your product inventory
+          </p>
         </div>
-        <button onClick={() => setShowModal(true)} className="btn btn-primary gap-2">
+        <button
+          onClick={() => setShowModal(true)}
+          className="btn btn-primary gap-2"
+        >
           <PlusIcon className="w-5 h-5" />
           Add Product
         </button>
@@ -170,18 +183,24 @@ const handleEdit = (product) => {
                     <div className="flex items-start justify-between">
                       <div>
                         <h3 className="card-title">{product.name}</h3>
-                        <p className="text-base-content/70 text-sm">{product.category?.name}</p>
+                        <p className="text-base-content/70 text-sm">
+                          {product.category?.name}
+                        </p>
                       </div>
-                      <div className={`badge ${status.class}`}>{status.text}</div>
+                      <div className={`badge ${status.class}`}>
+                        {status.text}
+                      </div>
                     </div>
                     <div className="flex items-center gap-6 mt-4">
                       <div>
                         <p className="text-xs text-base-content/70">Price</p>
-                        <p className="font-bold text-lg">{product.price}.00 dz</p>
+                        <p className="font-bold text-lg">{product.price}</p>
                       </div>
                       <div>
                         <p className="text-xs text-base-content/70">Stock</p>
-                        <p className="font-bold text-lg">{product.stock} units</p>
+                        <p className="font-bold text-lg">
+                          {product.stock} units
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -213,7 +232,13 @@ const handleEdit = (product) => {
 
       {/* ADD/EDIT PRODUCT MODAL */}
 
-      <input type="checkbox" className="modal-toggle" checked={showModal} onChange={() => {}} readOnly />
+      <input
+        type="checkbox"
+        className="modal-toggle"
+        checked={showModal}
+        onChange={() => {}}
+        readOnly
+      />
 
       <div className="modal">
         <div className="modal-box max-w-2xl">
@@ -222,7 +247,10 @@ const handleEdit = (product) => {
               {editingProduct ? "Edit Product" : "Add New Product"}
             </h3>
 
-            <button onClick={closeModal} className="btn btn-sm btn-circle btn-ghost">
+            <button
+              onClick={closeModal}
+              className="btn btn-sm btn-circle btn-ghost"
+            >
               <XIcon className="w-5 h-5" />
             </button>
           </div>
@@ -239,7 +267,9 @@ const handleEdit = (product) => {
                   placeholder="Enter product name"
                   className="input input-bordered"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -251,15 +281,21 @@ const handleEdit = (product) => {
                 <select
                   className="select select-bordered"
                   value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value , subcategory: ""})}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      category: e.target.value,
+                      subcategory: "",
+                    })
+                  }
                   required
                 >
-                    <option value="">Select category</option>
-                    {categories.map((cat)=>(
-                      <option key={cat._id} value={cat._id}>
-                        {cat.name}
-                      </option>
-                    ))}
+                  <option value="">Select category</option>
+                  {categories.map((cat) => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.name}
+                    </option>
+                  ))}
                 </select>
                 <label className="label">
                   <span>Sub Category</span>
@@ -267,16 +303,18 @@ const handleEdit = (product) => {
                 <select
                   className="select select-bordered"
                   value={formData.subcategory}
-                  onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, subcategory: e.target.value })
+                  }
                   required
-                  disabled={!formData.category} 
+                  disabled={!formData.category}
                 >
-                    <option value="">Select sub category</option>
-                    {filteredSubcategories.map((sub) =>(
-                      <option key={sub._id} value={sub._id}>
-                        {sub.name}
-                      </option>
-                    ))}
+                  <option value="">Select sub category</option>
+                  {filteredSubcategories.map((sub) => (
+                    <option key={sub._id} value={sub._id}>
+                      {sub.name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -292,7 +330,9 @@ const handleEdit = (product) => {
                   placeholder="0.00"
                   className="input input-bordered"
                   value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, price: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -306,7 +346,9 @@ const handleEdit = (product) => {
                   placeholder="0"
                   className="input input-bordered"
                   value={formData.stock}
-                  onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, stock: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -320,7 +362,9 @@ const handleEdit = (product) => {
                 className="textarea textarea-bordered h-24 w-full"
                 placeholder="Enter product description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 required
               />
             </div>
@@ -331,7 +375,9 @@ const handleEdit = (product) => {
                   <ImageIcon className="h-5 w-5" />
                   Product Images
                 </span>
-                <span className="label-text-alt text-xs opacity-60">Max 3 images</span>
+                <span className="label-text-alt text-xs opacity-60">
+                  Max 3 images
+                </span>
               </label>
 
               <div className="bg-base-200 rounded-xl p-4 border-2 border-dashed border-base-300 hover:border-primary transition-colors">
@@ -369,7 +415,10 @@ const handleEdit = (product) => {
                 type="button"
                 onClick={closeModal}
                 className="btn"
-                disabled={createProductMutation.isPending || updateProductMutation.isPending}
+                disabled={
+                  createProductMutation.isPending ||
+                  updateProductMutation.isPending
+                }
               >
                 Cancel
               </button>
@@ -377,9 +426,13 @@ const handleEdit = (product) => {
               <button
                 type="submit"
                 className="btn btn-primary"
-                disabled={createProductMutation.isPending || updateProductMutation.isPending}
+                disabled={
+                  createProductMutation.isPending ||
+                  updateProductMutation.isPending
+                }
               >
-                {createProductMutation.isPending || updateProductMutation.isPending ? (
+                {createProductMutation.isPending ||
+                updateProductMutation.isPending ? (
                   <span className="loading loading-spinner"></span>
                 ) : editingProduct ? (
                   "Update Product"
