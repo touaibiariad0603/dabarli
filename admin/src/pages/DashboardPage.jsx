@@ -7,7 +7,7 @@ import {
   UsersIcon,
 } from "lucide-react";
 import { capitalizeText, formatDate, getOrderStatusBadge } from "../lib/utils";
-import { formatPrice } from "../components/format-price";
+import { formatPrice } from "../components/format-price.jsx";
 
 function DashboardPage() {
   const { data: ordersData, isLoading: ordersLoading } = useQuery({
@@ -117,7 +117,7 @@ function DashboardPage() {
 
                       <td>
                         <span className="font-semibold">
-                          {order.totalPrice.toFixed(2)}dz
+                          {formatPrice(order.totalPrice)}
                         </span>
                       </td>
 
