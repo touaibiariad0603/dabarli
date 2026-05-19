@@ -1,6 +1,8 @@
 import { DiagnosticCode } from "../models/diagnosticCode.model.js";
 import { DiagnosticScan } from "../models/diagnosticScan.model.js";
 import { Product } from "../models/product.model.js";
+import { DiagnosticRecommendation } from "../models/diagnosticRecommendation.model.js";
+
 export async function createDiagnosticScan(req, res) {
   try {
     const { vehicleInfo, codes } = req.body;
