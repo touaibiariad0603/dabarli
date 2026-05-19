@@ -59,7 +59,10 @@ export default function DiagnosticScreen() {
 
   const handleScan = async () => {
     if (!brand || !model || !year || !codes) {
-      Alert.alert("Missing information", "Please fill brand, model, year and codes.");
+      Alert.alert(
+        "Missing information",
+        "Please fill brand, model, year and codes.",
+      );
       return;
     }
 
@@ -95,7 +98,7 @@ export default function DiagnosticScreen() {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.headerCard}>
+      <View style={[styles.headerCard, { marginTop: 30 }]}>
         <View style={styles.iconBox}>
           <Ionicons name="car-sport" size={30} color="#F5A623" />
         </View>
@@ -104,47 +107,45 @@ export default function DiagnosticScreen() {
           <Text style={styles.title}>OBD Diagnostic</Text>
           <Text style={styles.subtitle}>Manual scan now, Bluetooth later</Text>
         </View>
-        
-
       </View>
 
-        <View
-  style={{
-    backgroundColor: "#2A1D10",
-    borderWidth: 1,
-    borderColor: "#3B2B1B",
-    padding: 14,
-    borderRadius: 16,
-    marginBottom: 18,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  }}
->
-  <Ionicons name="bluetooth" size={22} color="#F5A623" />
+      <View
+        style={{
+          backgroundColor: "#2A1D10",
+          borderWidth: 1,
+          borderColor: "#3B2B1B",
+          padding: 14,
+          borderRadius: 16,
+          marginBottom: 18,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+        }}
+      >
+        <Ionicons name="bluetooth" size={22} color="#F5A623" />
 
-  <View style={{ flex: 1 }}>
-    <Text
-      style={{
-        color: "#FFF7E6",
-        fontWeight: "bold",
-        marginBottom: 4,
-      }}
-    >
-      Bluetooth OBD Ready
-    </Text>
+        <View style={{ flex: 1 }}>
+          <Text
+            style={{
+              color: "#FFF7E6",
+              fontWeight: "bold",
+              marginBottom: 4,
+            }}
+          >
+            Bluetooth OBD Ready
+          </Text>
 
-    <Text
-      style={{
-        color: "#A68B6B",
-        lineHeight: 18,
-      }}
-    >
-      The system architecture supports future ELM327 Bluetooth
-      integration for automatic vehicle scanning.
-    </Text>
-  </View>
-</View>
+          <Text
+            style={{
+              color: "#A68B6B",
+              lineHeight: 18,
+            }}
+          >
+            The system architecture supports future ELM327 Bluetooth integration
+            for automatic vehicle scanning.
+          </Text>
+        </View>
+      </View>
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>Vehicle Information</Text>
 
@@ -193,7 +194,11 @@ export default function DiagnosticScreen() {
           style={styles.input}
         />
 
-        <TouchableOpacity onPress={handleScan} disabled={loading} style={styles.button}>
+        <TouchableOpacity
+          onPress={handleScan}
+          disabled={loading}
+          style={styles.button}
+        >
           {loading ? (
             <ActivityIndicator color="white" />
           ) : (
@@ -241,7 +246,7 @@ export default function DiagnosticScreen() {
         </View>
       )}
 
-      <View style={styles.card}>
+      <View style={[styles.card, { marginBottom: 150 }]}>
         <View style={styles.historyHeader}>
           <Text style={styles.sectionTitle}>Scan History</Text>
 
@@ -326,7 +331,7 @@ const styles = {
     marginTop: 4,
   },
   card: {
-   backgroundColor: "#16110D",
+    backgroundColor: "#16110D",
     borderRadius: 22,
     padding: 18,
     marginBottom: 18,

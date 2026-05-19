@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { formatPrice } from "./format-price";
 interface ProductsGridProps {
   isLoading: boolean;
   isError: boolean;
@@ -19,7 +20,7 @@ interface ProductsGridProps {
 }
 
 const ProductsGrid = ({ products, isLoading, isError }: ProductsGridProps) => {
-const { isInWishlist, toggleWishlist, isWishlistPending } = useWishlist();
+  const { isInWishlist, toggleWishlist, isWishlistPending } = useWishlist();
 
   const { isAddingToCart, addToCart } = useCart();
 
@@ -31,9 +32,12 @@ const { isInWishlist, toggleWishlist, isWishlistPending } = useWishlist();
           Alert.alert("Success", `${productName} added to cart!`);
         },
         onError: (error: any) => {
-          Alert.alert("Error", error?.response?.data?.error || "Failed to add to cart");
+          Alert.alert(
+            "Error",
+            error?.response?.data?.error || "Failed to add to cart",
+          );
         },
-      }
+      },
     );
   };
 
@@ -56,7 +60,7 @@ const { isInWishlist, toggleWishlist, isWishlistPending } = useWishlist();
           activeOpacity={0.7}
           onPress={() => toggleWishlist(product._id)}
           disabled={isWishlistPending(product._id)}
-          >
+        >
           {isWishlistPending(product._id) ? (
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
@@ -70,8 +74,13 @@ const { isInWishlist, toggleWishlist, isWishlistPending } = useWishlist();
       </View>
 
       <View className="p-3">
-        <Text className="text-text-secondary text-xs mb-1">{product.category.name}</Text>
-        <Text className="text-text-primary font-bold text-sm mb-2" numberOfLines={2}>
+        <Text className="text-text-secondary text-xs mb-1">
+          {product.category.name}
+        </Text>
+        <Text
+          className="text-text-primary font-bold text-sm mb-2"
+          numberOfLines={2}
+        >
           {product.name}
         </Text>
 
@@ -80,11 +89,15 @@ const { isInWishlist, toggleWishlist, isWishlistPending } = useWishlist();
           <Text className="text-text-primary text-xs font-semibold ml-1">
             {product.averageRating.toFixed(1)}
           </Text>
-          <Text className="text-text-secondary text-xs ml-1">({product.totalReviews})</Text>
+          <Text className="text-text-secondary text-xs ml-1">
+            ({product.totalReviews})
+          </Text>
         </View>
 
         <View className="flex-row items-center justify-between">
-          <Text className="text-primary font-bold text-lg">{product.price.toFixed(2)}dz</Text>
+          <Text className="text-primary font-bold text-lg">
+            {formatPrice(product.price)}
+          </Text>
 
           <TouchableOpacity
             className="bg-primary rounded-full w-8 h-8 items-center justify-center"
@@ -116,8 +129,12 @@ const { isInWishlist, toggleWishlist, isWishlistPending } = useWishlist();
     return (
       <View className="py-20 items-center justify-center">
         <Ionicons name="alert-circle-outline" size={48} color="#FF6B6B" />
-        <Text className="text-text-primary font-semibold mt-4">Failed to load products</Text>
-        <Text className="text-text-secondary text-sm mt-2">Please try again later</Text>
+        <Text className="text-text-primary font-semibold mt-4">
+          Failed to load products
+        </Text>
+        <Text className="text-text-secondary text-sm mt-2">
+          Please try again later
+        </Text>
       </View>
     );
   }
@@ -142,8 +159,12 @@ function NoProductsFound() {
   return (
     <View className="py-20 items-center justify-center">
       <Ionicons name="search-outline" size={48} color={"#666"} />
-      <Text className="text-text-primary font-semibold mt-4">No products found</Text>
-      <Text className="text-text-secondary text-sm mt-2">Try adjusting your filters</Text>
+      <Text className="text-text-primary font-semibold mt-4">
+        No products found
+      </Text>
+      <Text className="text-text-secondary text-sm mt-2">
+        Try adjusting your filters
+      </Text>
     </View>
   );
 }

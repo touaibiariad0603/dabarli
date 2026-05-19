@@ -1,6 +1,8 @@
 import AddressSelectionModal from "@/components/AddressSelectionModal";
 import OrderSummary from "@/components/OrderSummary";
-import PaymentMethodModal, { PaymentMethod } from "@/components/PaymentMethodModal";
+import PaymentMethodModal, {
+  PaymentMethod,
+} from "@/components/PaymentMethodModal";
 import SafeScreen from "@/components/SafeScreen";
 import { useAddresses } from "@/hooks/useAddressess";
 import useCart from "@/hooks/useCart";
@@ -11,10 +13,18 @@ import { useStripe } from "@stripe/stripe-react-native";
 import { Image } from "expo-image";
 import * as WebBrowser from "expo-web-browser";
 import { useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import * as Sentry from "@sentry/react-native";
 import axios from "axios";
+import { formatPrice } from "@/components/format-price";
 
 const CartScreen = () => {
   const api = useApi();
@@ -36,20 +46,25 @@ const CartScreen = () => {
 
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [addressModalVisible, setAddressModalVisible] = useState(false);
-  const [paymentMethodModalVisible, setPaymentMethodModalVisible] = useState(false);
+  const [paymentMethodModalVisible, setPaymentMethodModalVisible] =
+    useState(false);
 
   // Temporarily hold the address chosen in step 1 until the user picks a method in step 2
   const [pendingAddress, setPendingAddress] = useState<Address | null>(null);
 
   const cartItems = Array.isArray(cart?.items) ? cart.items : [];
   const subtotal = cartTotal;
-  const shipping = 10.0;
+  const shipping = 650;
   const tax = subtotal * 0.08;
   const total = subtotal + shipping + tax;
 
   // ─── Quantity / Remove helpers ────────────────────────────────────────────
 
-  const handleQuantityChange = (productId: string, currentQuantity: number, change: number) => {
+  const handleQuantityChange = (
+    productId: string,
+    currentQuantity: number,
+    change: number,
+  ) => {
     const newQuantity = currentQuantity + change;
     if (newQuantity < 1) return;
     updateQuantity({ productId, quantity: newQuantity });
@@ -58,7 +73,11 @@ const CartScreen = () => {
   const handleRemoveItem = (productId: string, productName: string) => {
     Alert.alert("Remove Item", `Remove ${productName} from cart?`, [
       { text: "Cancel", style: "cancel" },
-      { text: "Remove", style: "destructive", onPress: () => removeFromCart(productId) },
+      {
+        text: "Remove",
+        style: "destructive",
+        onPress: () => removeFromCart(productId),
+      },
     ]);
   };
 
@@ -71,7 +90,7 @@ const CartScreen = () => {
       Alert.alert(
         "No Address",
         "Please add a shipping address in your profile before checking out.",
-        [{ text: "OK" }]
+        [{ text: "OK" }],
       );
       return;
     }
@@ -114,7 +133,7 @@ const CartScreen = () => {
 
       Sentry.logger.info("Cash on delivery initiated", {
         itemCount: cartItemCount,
-        total: total.toFixed(2),
+        total: total,
         city: address.city,
       });
 
@@ -126,19 +145,19 @@ const CartScreen = () => {
       });
 
       Sentry.logger.info("Cash on delivery order placed", {
-        total: total.toFixed(2),
+        total: total,
         itemCount: cartItems.length,
       });
 
       Alert.alert(
         "Order Placed! 🎉",
         "Your order has been placed. You'll pay when it arrives.",
-        [{ text: "OK", onPress: () => clearCart() }]
+        [{ text: "OK", onPress: () => clearCart() }],
       );
     } catch (error: any) {
       // Extract the most useful message available
       const serverMessage =
-        error?.response?.data?.message ||   // axios-style error body
+        error?.response?.data?.message || // axios-style error body
         error?.message ||
         "Unknown error";
 
@@ -153,7 +172,7 @@ const CartScreen = () => {
         "Order Failed",
         __DEV__
           ? `[DEV] ${error?.response?.status ?? ""} ${serverMessage}`
-          : "Failed to place your order. Please try again."
+          : "Failed to place your order. Please try again.",
       );
     } finally {
       setPaymentLoading(false);
@@ -165,7 +184,7 @@ const CartScreen = () => {
   const handleStripePayment = async (address: Address) => {
     Sentry.logger.info("Checkout initiated (card)", {
       itemCount: cartItemCount,
-      total: total.toFixed(2),
+      total: total,
       city: address.city,
     });
 
@@ -201,13 +220,13 @@ const CartScreen = () => {
         Alert.alert("Payment cancelled", presentError.message);
       } else {
         Sentry.logger.info("Card payment successful", {
-          total: total.toFixed(2),
+          total: total,
           itemCount: cartItems.length,
         });
         Alert.alert(
           "Success",
           "Your payment was successful! Your order is being processed.",
-          [{ text: "OK", onPress: () => clearCart() }]
+          [{ text: "OK", onPress: () => clearCart() }],
         );
       }
     } catch (error) {
@@ -223,90 +242,94 @@ const CartScreen = () => {
 
   // ─── SlickPay ─────────────────────────────────────────────────────────────
 
-const handleSlickPayPayment = async (address: Address) => {
-  const SLICKPAY_KEY = process.env.EXPO_PUBLIC_SLICKPAY_KEY!;
-  try {
-    setPaymentLoading(true);
+  const handleSlickPayPayment = async (address: Address) => {
+    const SLICKPAY_KEY = process.env.EXPO_PUBLIC_SLICKPAY_KEY!;
+    try {
+      setPaymentLoading(true);
 
- 
-
-    const { data } = await axios.post(
-      "https://devapi.slick-pay.com/api/v2/users/invoices",
-      {
-        amount: Math.round(total),
-        url: "https://dabarli.onrender.com/api/health",
-        items: cartItems.map((item) => ({
-          name: item.product.name,
-          price: Math.round(item.product.price),
-          quantity: item.quantity,
-        })),
-        firstname: address.fullName.split(" ")[0] || "Client",
-        lastname: address.fullName.split(" ").slice(1).join(" ") || ".",
-        phone: address.phoneNumber,
-        address: `${address.streetAddress}, ${address.city}`,
-      },
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${SLICKPAY_KEY}`,
+      const { data } = await axios.post(
+        "https://devapi.slick-pay.com/api/v2/users/invoices",
+        {
+          amount: Math.round(total),
+          url: "https://dabarli.onrender.com/api/health",
+          items: cartItems.map((item) => ({
+            name: item.product.name,
+            price: Math.round(item.product.price),
+            quantity: item.quantity,
+          })),
+          firstname: address.fullName.split(" ")[0] || "Client",
+          lastname: address.fullName.split(" ").slice(1).join(" ") || ".",
+          phone: address.phoneNumber,
+          address: `${address.streetAddress}, ${address.city}`,
         },
-      }
-    );
-
-    if (!data.url) throw new Error("No checkout URL returned");
-
-    const invoiceId = data.id;
-    const checkoutUrl = data.url;
-
-    await WebBrowser.openBrowserAsync(checkoutUrl, {
-      presentationStyle: WebBrowser.WebBrowserPresentationStyle.FULL_SCREEN,
-    });
-
-    // Poll status directly from app
-    let paid = false;
-    for (let attempt = 0; attempt < 10; attempt++) {
-      await new Promise((r) => setTimeout(r, 2000));
-
-      const { data: statusData } = await axios.get(
-        `https://devapi.slick-pay.com/api/v2/users/invoices/${invoiceId}`,
         {
           headers: {
-            Authorization: `Bearer ${SLICKPAY_KEY}`,
             Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${SLICKPAY_KEY}`,
           },
-        }
+        },
       );
 
-      if (statusData.completed === 1) {
-        paid = true;
-        await api.post("/orders", {
-        orderItems: cartItems,
-        shippingAddress: buildShippingPayload(address),
-        paymentResult: { paymentMethod: "cib payment", status: "paid" },
-        totalPrice: total,
+      if (!data.url) throw new Error("No checkout URL returned");
+
+      const invoiceId = data.id;
+      const checkoutUrl = data.url;
+
+      await WebBrowser.openBrowserAsync(checkoutUrl, {
+        presentationStyle: WebBrowser.WebBrowserPresentationStyle.FULL_SCREEN,
       });
-        clearCart();
-        break;
-        
+
+      // Poll status directly from app
+      let paid = false;
+      for (let attempt = 0; attempt < 10; attempt++) {
+        await new Promise((r) => setTimeout(r, 2000));
+
+        const { data: statusData } = await axios.get(
+          `https://devapi.slick-pay.com/api/v2/users/invoices/${invoiceId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${SLICKPAY_KEY}`,
+              Accept: "application/json",
+            },
+          },
+        );
+
+        if (statusData.completed === 1) {
+          paid = true;
+          await api.post("/orders", {
+            orderItems: cartItems,
+            shippingAddress: buildShippingPayload(address),
+            paymentResult: { paymentMethod: "cib payment", status: "paid" },
+            totalPrice: total,
+          });
+          clearCart();
+          break;
+        }
       }
-    }
 
-    if (paid) {
-
-      Alert.alert("Payment Successful! 🎉", "Your order is being processed.", [
-        { text: "OK", onPress: () => clearCart() },
-      ]);
-    } else {
-      Alert.alert("Payment Pending", "Check your orders shortly.");
+      if (paid) {
+        Alert.alert(
+          "Payment Successful! 🎉",
+          "Your order is being processed.",
+          [{ text: "OK", onPress: () => clearCart() }],
+        );
+      } else {
+        Alert.alert("Payment Pending", "Check your orders shortly.");
+      }
+    } catch (error: any) {
+      console.log(
+        "SlickPay error details:",
+        JSON.stringify(error?.response?.data),
+      );
+      Alert.alert(
+        "Payment Failed",
+        __DEV__ ? JSON.stringify(error?.response?.data) : "Please try again.",
+      );
+    } finally {
+      setPaymentLoading(false);
     }
-  }catch (error: any) {
-  console.log("SlickPay error details:", JSON.stringify(error?.response?.data));
-  Alert.alert("Payment Failed", __DEV__ ? JSON.stringify(error?.response?.data) : "Please try again.");
-} finally {
-    setPaymentLoading(false);
-  }
-};
+  };
 
   // ─── Shared helper ────────────────────────────────────────────────────────
 
@@ -327,7 +350,9 @@ const handleSlickPayPayment = async (address: Address) => {
 
   return (
     <SafeScreen>
-      <Text className="px-6 pb-5 text-text-primary text-3xl font-bold tracking-tight">Cart</Text>
+      <Text className="px-6 pb-5 text-text-primary text-3xl font-bold tracking-tight">
+        Cart
+      </Text>
 
       <ScrollView
         className="flex-1"
@@ -338,7 +363,10 @@ const handleSlickPayPayment = async (address: Address) => {
           {cartItems
             .filter((item) => item?.product)
             .map((item) => (
-              <View key={item._id} className="bg-surface rounded-3xl overflow-hidden">
+              <View
+                key={item._id}
+                className="bg-surface rounded-3xl overflow-hidden"
+              >
                 <View className="p-4 flex-row">
                   {/* Product image */}
                   <View className="relative">
@@ -349,7 +377,9 @@ const handleSlickPayPayment = async (address: Address) => {
                       style={{ width: 112, height: 112, borderRadius: 16 }}
                     />
                     <View className="absolute top-2 right-2 bg-primary rounded-full px-2 py-0.5">
-                      <Text className="text-background text-xs font-bold">×{item.quantity}</Text>
+                      <Text className="text-background text-xs font-bold">
+                        ×{item.quantity}
+                      </Text>
                     </View>
                   </View>
 
@@ -363,11 +393,10 @@ const handleSlickPayPayment = async (address: Address) => {
                       </Text>
                       <View className="flex-row items-center mt-2">
                         <Text className="text-primary font-bold text-2xl">
-                          {(item.product.price * item.quantity).toFixed(2)}dz
+                          {formatPrice(item.product.price * item.quantity)}
                         </Text>
                         <Text className="text-text-secondary text-sm">
-                          {" "}
-                          {item.product.price.toFixed(2)}dz each
+                          {formatPrice(item.product.price)}
                         </Text>
                       </View>
                     </View>
@@ -377,7 +406,13 @@ const handleSlickPayPayment = async (address: Address) => {
                       <TouchableOpacity
                         className="bg-background-lighter rounded-full w-9 h-9 items-center justify-center"
                         activeOpacity={0.7}
-                        onPress={() => handleQuantityChange(item.product._id, item.quantity, -1)}
+                        onPress={() =>
+                          handleQuantityChange(
+                            item.product._id,
+                            item.quantity,
+                            -1,
+                          )
+                        }
                         disabled={isUpdating}
                       >
                         {isUpdating ? (
@@ -388,14 +423,22 @@ const handleSlickPayPayment = async (address: Address) => {
                       </TouchableOpacity>
 
                       <View className="mx-4 min-w-[32px] items-center">
-                        <Text className="text-text-primary font-bold text-lg">{item.quantity}</Text>
+                        <Text className="text-text-primary font-bold text-lg">
+                          {item.quantity}
+                        </Text>
                       </View>
 
                       {/* Increase */}
                       <TouchableOpacity
                         className="bg-primary rounded-full w-9 h-9 items-center justify-center"
                         activeOpacity={0.7}
-                        onPress={() => handleQuantityChange(item.product._id, item.quantity, 1)}
+                        onPress={() =>
+                          handleQuantityChange(
+                            item.product._id,
+                            item.quantity,
+                            1,
+                          )
+                        }
                         disabled={isUpdating}
                       >
                         {isUpdating ? (
@@ -409,10 +452,16 @@ const handleSlickPayPayment = async (address: Address) => {
                       <TouchableOpacity
                         className="ml-auto bg-red-500/10 rounded-full w-9 h-9 items-center justify-center"
                         activeOpacity={0.7}
-                        onPress={() => handleRemoveItem(item.product._id, item.product.name)}
+                        onPress={() =>
+                          handleRemoveItem(item.product._id, item.product.name)
+                        }
                         disabled={isRemoving}
                       >
-                        <Ionicons name="trash-outline" size={18} color="#EF4444" />
+                        <Ionicons
+                          name="trash-outline"
+                          size={18}
+                          color="#EF4444"
+                        />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -421,7 +470,12 @@ const handleSlickPayPayment = async (address: Address) => {
             ))}
         </View>
 
-        <OrderSummary subtotal={subtotal} shipping={shipping} tax={tax} total={total} />
+        <OrderSummary
+          subtotal={subtotal}
+          shipping={shipping}
+          tax={tax}
+          total={total}
+        />
       </ScrollView>
 
       {/* Sticky bottom bar */}
@@ -436,11 +490,13 @@ const handleSlickPayPayment = async (address: Address) => {
               {cartItemCount} {cartItemCount === 1 ? "item" : "items"}
             </Text>
           </View>
-          <Text className="text-text-primary font-bold text-xl">{total.toFixed(2)}dz</Text>
+          <Text className="text-text-primary font-bold text-xl">
+            {formatPrice(total)}
+          </Text>
         </View>
 
         <TouchableOpacity
-          className="bg-primary rounded-2xl overflow-hidden"
+          className="bg-primary mb-3  rounded-2xl overflow-hidden"
           activeOpacity={0.9}
           onPress={handleCheckout}
           disabled={paymentLoading}
@@ -450,7 +506,9 @@ const handleSlickPayPayment = async (address: Address) => {
               <ActivityIndicator size="small" color="#121212" />
             ) : (
               <>
-                <Text className="text-background font-bold text-lg mr-2">Checkout</Text>
+                <Text className="text-background font-bold text-lg mr-2">
+                  Checkout
+                </Text>
                 <Ionicons name="arrow-forward" size={20} color="#121212" />
               </>
             )}
@@ -462,7 +520,7 @@ const handleSlickPayPayment = async (address: Address) => {
       <AddressSelectionModal
         visible={addressModalVisible}
         onClose={() => setAddressModalVisible(false)}
-        onProceed={handleAddressSelected}   // ← changed from handleProceedWithPayment
+        onProceed={handleAddressSelected} // ← changed from handleProceedWithPayment
         isProcessing={paymentLoading}
       />
 
@@ -495,7 +553,9 @@ function ErrorUI() {
   return (
     <View className="flex-1 bg-background items-center justify-center px-6">
       <Ionicons name="alert-circle-outline" size={64} color="#FF6B6B" />
-      <Text className="text-text-primary font-semibold text-xl mt-4">Failed to load cart</Text>
+      <Text className="text-text-primary font-semibold text-xl mt-4">
+        Failed to load cart
+      </Text>
       <Text className="text-text-secondary text-center mt-2">
         Please check your connection and try again
       </Text>
@@ -507,11 +567,15 @@ function EmptyUI() {
   return (
     <View className="flex-1 bg-background">
       <View className="px-6 pt-16 pb-5">
-        <Text className="text-text-primary text-3xl font-bold tracking-tight">Cart</Text>
+        <Text className="text-text-primary text-3xl font-bold tracking-tight">
+          Cart
+        </Text>
       </View>
       <View className="flex-1 items-center justify-center px-6">
         <Ionicons name="cart-outline" size={80} color="#666" />
-        <Text className="text-text-primary font-semibold text-xl mt-4">Your cart is empty</Text>
+        <Text className="text-text-primary font-semibold text-xl mt-4">
+          Your cart is empty
+        </Text>
         <Text className="text-text-secondary text-center mt-2">
           Add some products to get started
         </Text>

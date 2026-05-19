@@ -2,7 +2,14 @@ import { useAddresses } from "@/hooks/useAddressess";
 import { Address } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { ActivityIndicator, Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Modal,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface AddressSelectionModalProps {
   visible: boolean;
@@ -21,25 +28,35 @@ const AddressSelectionModal = ({
   const { addresses, isLoading: addressesLoading } = useAddresses();
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={true} onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={onClose}
+    >
       <View className="flex-1 bg-black/50 justify-end">
-        <View className="bg-background rounded-t-3xl h-1/2">
+        <View className="bg-background rounded-t-3xl h-[55%]">
           {/* Modal Header */}
           <View className="flex-row items-center justify-between p-6 border-b border-surface">
-            <Text className="text-text-primary text-2xl font-bold">Select Address</Text>
-            <TouchableOpacity onPress={onClose} className="bg-surface rounded-full p-2">
+            <Text className="text-text-primary text-2xl font-bold">
+              Select Address
+            </Text>
+            <TouchableOpacity
+              onPress={onClose}
+              className="bg-surface rounded-full p-2"
+            >
               <Ionicons name="close" size={24} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
 
           {/* ADDRESSES LIST */}
-          <ScrollView className="flex-1 p-6">
+          <ScrollView className="flex-1  p-6">
             {addressesLoading ? (
               <View className="py-8">
                 <ActivityIndicator size="large" color="#00D9FF" />
               </View>
             ) : (
-              <View className="gap-4">
+              <View className="gap-4 ">
                 {addresses?.map((address: Address) => (
                   <TouchableOpacity
                     key={address._id}
@@ -51,7 +68,7 @@ const AddressSelectionModal = ({
                     activeOpacity={0.7}
                     onPress={() => setSelectedAddress(address)}
                   >
-                    <View className="flex-row items-start justify-between">
+                    <View className="flex-row  items-start justify-between">
                       <View className="flex-1">
                         <View className="flex-row items-center mb-3">
                           <Text className="text-primary font-bold text-lg mr-2">
@@ -59,7 +76,9 @@ const AddressSelectionModal = ({
                           </Text>
                           {address.isDefault && (
                             <View className="bg-primary/20 rounded-full px-3 py-1">
-                              <Text className="text-primary text-sm font-semibold">Default</Text>
+                              <Text className="text-primary text-sm font-semibold">
+                                Default
+                              </Text>
                             </View>
                           )}
                         </View>
@@ -72,11 +91,17 @@ const AddressSelectionModal = ({
                         <Text className="text-text-secondary text-base mb-2">
                           {address.city}, {address.state} {address.zipCode}
                         </Text>
-                        <Text className="text-text-secondary text-base">{address.phoneNumber}</Text>
+                        <Text className="text-text-secondary text-base">
+                          {address.phoneNumber}
+                        </Text>
                       </View>
                       {selectedAddress?._id === address._id && (
                         <View className="bg-primary rounded-full p-2 ml-3">
-                          <Ionicons name="checkmark" size={24} color="#121212" />
+                          <Ionicons
+                            name="checkmark"
+                            size={24}
+                            color="#121212"
+                          />
                         </View>
                       )}
                     </View>
