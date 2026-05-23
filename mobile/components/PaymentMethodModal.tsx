@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
 import { formatPrice } from "./format-price";
 
-export type PaymentMethod = "card" | "delivery" | "slickpay";
+export type PaymentMethod = "delivery" | "slickpay";
 
 interface Props {
   visible: boolean;
@@ -20,13 +20,7 @@ const METHODS: {
   iconColor: string;
   badge?: string;
 }[] = [
-  // {
-  //   id: "card",
-  //   label: "Pay by Card",
-  //   description: "Visa, Mastercard via Stripe",
-  //   icon: "card-outline",
-  //   iconColor: "#1DB954",
-  // },
+
   {
     id: "slickpay",
     label: "Cib/dahabia",

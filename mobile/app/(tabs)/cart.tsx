@@ -9,7 +9,6 @@ import useCart from "@/hooks/useCart";
 import { useApi } from "@/lib/api";
 import { Address } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
-import { useStripe } from "@stripe/stripe-react-native";
 import { Image } from "expo-image";
 import * as WebBrowser from "expo-web-browser";
 import { useState } from "react";
@@ -42,7 +41,6 @@ const CartScreen = () => {
   } = useCart();
   const { addresses } = useAddresses();
 
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [addressModalVisible, setAddressModalVisible] = useState(false);
@@ -113,9 +111,7 @@ const CartScreen = () => {
     if (!pendingAddress) return;
 
     switch (method) {
-      case "card":
-        await handleStripePayment(pendingAddress);
-        break;
+ 
       case "slickpay":
         await handleSlickPayPayment(pendingAddress);
         break;
@@ -179,66 +175,7 @@ const CartScreen = () => {
     }
   };
 
-  // ─── Stripe card payment ──────────────────────────────────────────────────
 
-  const handleStripePayment = async (address: Address) => {
-    Sentry.logger.info("Checkout initiated (card)", {
-      itemCount: cartItemCount,
-      total: total,
-      city: address.city,
-    });
-
-    try {
-      setPaymentLoading(true);
-
-      const { data } = await api.post("/payment/create-intent", {
-        cartItems,
-        shippingAddress: buildShippingPayload(address),
-      });
-
-      const { error: initError } = await initPaymentSheet({
-        paymentIntentClientSecret: data.clientSecret,
-        merchantDisplayName: "Your Store Name",
-      });
-
-      if (initError) {
-        Sentry.logger.error("Payment sheet init failed", {
-          errorCode: initError.code,
-          errorMessage: initError.message,
-        });
-        Alert.alert("Error", initError.message);
-        return;
-      }
-
-      const { error: presentError } = await presentPaymentSheet();
-
-      if (presentError) {
-        Sentry.logger.error("Payment cancelled", {
-          errorCode: presentError.code,
-          errorMessage: presentError.message,
-        });
-        Alert.alert("Payment cancelled", presentError.message);
-      } else {
-        Sentry.logger.info("Card payment successful", {
-          total: total,
-          itemCount: cartItems.length,
-        });
-        Alert.alert(
-          "Success",
-          "Your payment was successful! Your order is being processed.",
-          [{ text: "OK", onPress: () => clearCart() }],
-        );
-      }
-    } catch (error) {
-      Sentry.logger.error("Card payment failed", {
-        error: error instanceof Error ? error.message : "Unknown error",
-        cartTotal: total,
-      });
-      Alert.alert("Error", "Failed to process payment");
-    } finally {
-      setPaymentLoading(false);
-    }
-  };
 
   // ─── SlickPay ─────────────────────────────────────────────────────────────
 
