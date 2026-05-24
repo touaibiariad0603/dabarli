@@ -11,9 +11,11 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useApi } from "../../lib/api";
 import { DiagnosticScan } from "@/types";
+import { useRouter } from "expo-router";
 
 export default function DiagnosticScreen() {
   const api = useApi();
+  const router = useRouter();
 
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
@@ -41,13 +43,17 @@ export default function DiagnosticScreen() {
     }
   };
 
+  const getRecommendedProducts = (scan: any) => {
+    return scan?.recommendedProducts || scan?.recomendedProducts || [];
+  };
+
   const fetchScanHistory = async () => {
     try {
       setHistoryLoading(true);
       const response = await api.get("/diagnostics/scans");
       setScanHistory(response.data.scans || []);
     } catch (error) {
-      console.log(error);
+      console.log("Fetch scan history error:", error);
     } finally {
       setHistoryLoading(false);
     }
@@ -84,17 +90,27 @@ export default function DiagnosticScreen() {
         codes: formattedCodes,
       });
 
+      console.log("Diagnostic scan response:", response.data);
+      console.log(
+        "Recommended products:",
+        response.data.scan?.recommendedProducts ||
+          response.data.scan?.recomendedProducts ||
+          [],
+      );
+
       setScanResult(response.data.scan);
       await fetchScanHistory();
 
       Alert.alert("Success", "Diagnostic scan created successfully");
     } catch (error) {
-      console.log(error);
+      console.log("Create diagnostic scan error:", error);
       Alert.alert("Error", "Failed to create diagnostic scan");
     } finally {
       setLoading(false);
     }
   };
+
+  const recommendedProducts = getRecommendedProducts(scanResult);
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -109,43 +125,19 @@ export default function DiagnosticScreen() {
         </View>
       </View>
 
-      <View
-        style={{
-          backgroundColor: "#2A1D10",
-          borderWidth: 1,
-          borderColor: "#3B2B1B",
-          padding: 14,
-          borderRadius: 16,
-          marginBottom: 18,
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 10,
-        }}
-      >
+      <View style={styles.bluetoothCard}>
         <Ionicons name="bluetooth" size={22} color="#F5A623" />
 
         <View style={{ flex: 1 }}>
-          <Text
-            style={{
-              color: "#FFF7E6",
-              fontWeight: "bold",
-              marginBottom: 4,
-            }}
-          >
-            Bluetooth OBD Ready
-          </Text>
+          <Text style={styles.bluetoothTitle}>Bluetooth OBD Ready</Text>
 
-          <Text
-            style={{
-              color: "#A68B6B",
-              lineHeight: 18,
-            }}
-          >
+          <Text style={styles.bluetoothText}>
             The system architecture supports future ELM327 Bluetooth integration
             for automatic vehicle scanning.
           </Text>
         </View>
       </View>
+
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>Vehicle Information</Text>
 
@@ -243,6 +235,43 @@ export default function DiagnosticScreen() {
               </View>
             ))
           )}
+
+          <View style={{ marginTop: 18 }}>
+            <Text style={styles.sectionTitle}>Recommended Products</Text>
+
+            {recommendedProducts.length === 0 ? (
+              <Text style={styles.emptyText}>No recommended products found.</Text>
+            ) : (
+              recommendedProducts.map((product: any) => (
+                <View key={product._id} style={styles.productCard}>
+                  <Text style={styles.productName}>
+                    {product.name || "Unnamed product"}
+                  </Text>
+
+                  {!!product.description && (
+                    <Text style={styles.description} numberOfLines={2}>
+                      {product.description}
+                    </Text>
+                  )}
+
+                  <Text style={styles.productPrice}>
+                    {product.price ? `${product.price} DA` : "Price unavailable"}
+                  </Text>
+
+                  <TouchableOpacity
+                    activeOpacity={0.85}
+                    style={styles.viewProductButton}
+                    onPress={() => router.push(`/product/${product._id}` as any)}
+                  >
+                    <Ionicons name="bag-handle" size={18} color="#0B0603" />
+                    <Text style={styles.viewProductButtonText}>
+                      View Product
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ))
+            )}
+          </View>
         </View>
       )}
 
@@ -285,6 +314,12 @@ export default function DiagnosticScreen() {
                   ? scan.diagnosticCodes.map((code) => code.code).join(", ")
                   : "No codes"}
               </Text>
+
+              {getRecommendedProducts(scan).length > 0 && (
+                <Text style={styles.description}>
+                  Recommended products: {getRecommendedProducts(scan).length}
+                </Text>
+              )}
             </View>
           ))
         )}
@@ -329,6 +364,26 @@ const styles = {
   subtitle: {
     color: "#A68B6B",
     marginTop: 4,
+  },
+  bluetoothCard: {
+    backgroundColor: "#2A1D10",
+    borderWidth: 1,
+    borderColor: "#3B2B1B",
+    padding: 14,
+    borderRadius: 16,
+    marginBottom: 18,
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
+    gap: 10,
+  },
+  bluetoothTitle: {
+    color: "#FFF7E6",
+    fontWeight: "bold" as const,
+    marginBottom: 4,
+  },
+  bluetoothText: {
+    color: "#A68B6B",
+    lineHeight: 18,
   },
   card: {
     backgroundColor: "#16110D",
@@ -430,5 +485,40 @@ const styles = {
   historyDate: {
     color: "#94a3b8",
     marginTop: 3,
+  },
+  productCard: {
+    backgroundColor: "#211912",
+    padding: 15,
+    borderRadius: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#2D2218",
+  },
+  productName: {
+    color: "white",
+    fontWeight: "800" as const,
+    fontSize: 16,
+  },
+  productPrice: {
+    color: "#F5A623",
+    fontWeight: "800" as const,
+    fontSize: 16,
+    marginTop: 8,
+  },
+  viewProductButton: {
+    backgroundColor: "#F5A623",
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 14,
+    marginTop: 12,
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
+    gap: 8,
+  },
+  viewProductButtonText: {
+    color: "#0B0603",
+    fontWeight: "800" as const,
+    fontSize: 15,
   },
 };

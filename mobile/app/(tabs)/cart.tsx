@@ -180,7 +180,12 @@ const CartScreen = () => {
   // ─── SlickPay ─────────────────────────────────────────────────────────────
 
   const handleSlickPayPayment = async (address: Address) => {
-    const SLICKPAY_KEY = process.env.EXPO_PUBLIC_SLICKPAY_KEY!;
+    const SLICKPAY_KEY = process.env.EXPO_PUBLIC_SLICKPAY_KEY;
+
+  if (!SLICKPAY_KEY) {
+  Alert.alert("SlickPay Error", "SlickPay key is missing in this APK build.");
+  return;
+}
     try {
       setPaymentLoading(true);
 
@@ -254,18 +259,20 @@ const CartScreen = () => {
       } else {
         Alert.alert("Payment Pending", "Check your orders shortly.");
       }
-    } catch (error: any) {
-      console.log(
-        "SlickPay error details:",
-        JSON.stringify(error?.response?.data),
-      );
-      Alert.alert(
-        "Payment Failed",
-        __DEV__ ? JSON.stringify(error?.response?.data) : "Please try again.",
-      );
-    } finally {
-      setPaymentLoading(false);
-    }
+ } catch (error: any) {
+  const errorMessage =
+    error?.response?.data?.message ||
+    error?.response?.data?.error ||
+    JSON.stringify(error?.response?.data) ||
+    error?.message ||
+    "Unknown SlickPay error";
+
+  console.log("SlickPay error details:", errorMessage);
+
+  Alert.alert("Payment Failed", errorMessage);
+} finally {
+  setPaymentLoading(false);
+}
   };
 
   // ─── Shared helper ────────────────────────────────────────────────────────

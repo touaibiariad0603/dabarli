@@ -54,7 +54,7 @@ function OrdersPage() {
                 <thead>
                   <tr>
                     <th>Order ID</th>
-                    <th>Customer</th>
+                    <th>Customer / Phone</th>
                     <th>Items</th>
                     <th>Total</th>
                     <th>Status</th>
@@ -77,15 +77,15 @@ function OrdersPage() {
                           </span>
                         </td>
 
-                        <td>
-                          <div className="font-medium">
-                            {order.shippingAddress.fullName}
-                          </div>
-                          <div className="text-sm opacity-60">
-                            {order.shippingAddress.city},{" "}
-                            {order.shippingAddress.state}
-                          </div>
-                        </td>
+                      <td>
+                        <div className="font-medium">
+                        {order.shippingAddress?.fullName || order.user?.name || "Unknown Customer"}
+                        </div>
+
+                      <div className="text-sm opacity-60">
+                        {order.shippingAddress?.phoneNumber || "No phone number"}
+                      </div>
+                      </td>
 
                         <td>
                           <div className="font-medium">
